@@ -1,0 +1,23 @@
+Avant:
+choisir l'ip du serveur
+dans la box rendre l'ip du pc serveur fixe
+rentrer dans les paramètres de la box -> reglagess avancés
+-> DHCP iPV4 -> attribution d'adresse statique -> choisir l'equipement
+-> redirection de port -> port 8443 du rerveur redirigé vers le port 16443 de la box
+
+Maintenant:
+IP FAI 89.92.113.15
+IP du serveur 192.168.1.33
+le port utilisé est: 8443
+
+
+Développement du code :
+
+creer un environnement virtuel:
+python3 -m venv .venv
+l'activer:
+source .venv/bin/activate
+installer flask:
+pip install flask
+verifier l'installation
+python -m flask --version
