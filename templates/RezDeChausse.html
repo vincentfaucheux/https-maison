@@ -1,129 +1,239 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rez de chaussée</title>
-  <style>
-    header {
-      display: flex;
-      flex-direction: column; /* Aligne verticalement */
-      align-items: left;    /* Centre horizontalement */
-      text-align: center;
-      margin: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rez de chaussée</title>
+    <style>
+      header {
+        display: flex;
+        flex-direction: column; /* Aligne verticalement */
+        align-items: left; /* Centre horizontalement */
+        text-align: center;
+        margin: 20px;
+      }
 
-    header svg {
-      margin: 20px 0; /* Espace autour du dessin */
-    }
+      header svg {
+        margin: 20px 0; /* Espace autour du dessin */
+      }
 
-    header a {
-      text-decoration: none;
-      color: blue;
-      margin-top: 10px;
-    }
-    
-    <!-- new -->
-            body { font-family: sans-serif; }
-        .radiateur {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px;
-            cursor: pointer;
-            /*-- remove --*/
-            /*width: 200px;*/
-            /*-- end remove --*/
-            text-align: center;
-            display: inline-block;
-        }
+      header a {
+        text-decoration: none;
+        color: blue;
+        margin-top: 10px;
+      }
 
-        /* Fenêtre modale */
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 10;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            width: 300px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .close {
-            color: red;
-            float: right;
-            cursor: pointer;
-        }
-        <!-- end new -->
+      body {
+        font-family: sans-serif;
+      }
+      .radiateur {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        cursor: pointer;
+        /*-- remove --*/
+        /*width: 200px;*/
+        /*-- end remove --*/
+        text-align: center;
+        display: inline-block;
+      }
 
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Rez de chaussée</h1>
+      /* Fenêtre modale */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .modal-content {
+        background: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        width: 300px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .close {
+        color: red;
+        float: right;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Rez de chaussée</h1>
 
-    <!-- plan du rez de chaussee -->
-    <svg width="600" height="600">
-    
-    <!-- murs extérieurs -->
-    <line x1="50" y1="550" x2="550" y2="550" stroke="black" stroke-width="4"/> <!-- devant -->
-   <line x1="50" y1="200" x2="50" y2="550" stroke="black" stroke-width="4"/> <-- gauche -->
-     <line x1="550" y1="50" x2="550" y2="550" stroke="black" stroke-width="4"/> <!-- droit -->
-     <line x1="50" y1="200" x2="275" y2="200" stroke="black" stroke-width="4"/> <!-- jardin salle -->
-     <line x1="275" y1="50" x2="275" y2="200" stroke="black" stroke-width="4"/> <!-- renfoncement salon -->
-     <line x1="275" y1="50" x2="550" y2="50" stroke="black" stroke-width="4"/> <!-- jardin chambre -->
-     
-    <!-- cloisons garage -->
-    <line x1="325" y1="375" x2="325" y2="550" stroke="black" stroke-width="2"/> <!-- vertical -->
-    <line x1="325" y1="375" x2="550" y2="375" stroke="black" stroke-width="2"/> <!-- horizontal -->
-    <!-- cloisons salle de bain / chambre-->
-    <line x1="425" y1="300" x2="425" y2="375" stroke="black" stroke-width="2"/> <!-- vertical -->
-    <line x1="375" y1="300" x2="550" y2="300" stroke="black" stroke-width="2"/> <!-- horizontal -->
-    <line x1="375" y1="50" x2="375" y2="300" stroke="black" stroke-width="2"/> <!-- vertical -->
-    <!-- cloisons cuisine -->
-    <line x1="250" y1="400" x2="250" y2="550" stroke="black" stroke-width="2"/> <!-- vertical -->
-    <line x1="50" y1="400" x2="250" y2="400" stroke="black" stroke-width="2"/> <!-- horizontal -->
- 
-    <!-- Noms des pièces -->
-    <text x="150" y="300">Salle / Salon</text>
-    <text x="130" y="475">Cuisine</text>
-    <text x="430" y="200">Chambre</text>
-    <text x="430" y="335">Salle de bain</text>
-   
-     <!-- radiateurs -->
-     <!--
+      <!-- plan du rez de chaussee -->
+      <svg width="600" height="600">
+        <!-- murs extérieurs -->
+        <line
+          x1="50"
+          y1="550"
+          x2="550"
+          y2="550"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- devant -->
+        <line
+          x1="50"
+          y1="200"
+          x2="50"
+          y2="550"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- gauche -->
+        <line
+          x1="550"
+          y1="50"
+          x2="550"
+          y2="550"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- droit -->
+        <line
+          x1="50"
+          y1="200"
+          x2="275"
+          y2="200"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- jardin salle -->
+        <line
+          x1="275"
+          y1="50"
+          x2="275"
+          y2="200"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- renfoncement salon -->
+        <line
+          x1="275"
+          y1="50"
+          x2="550"
+          y2="50"
+          stroke="black"
+          stroke-width="4"
+        />
+        <!-- jardin chambre -->
+
+        <!-- cloisons garage -->
+        <line
+          x1="325"
+          y1="375"
+          x2="325"
+          y2="550"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- vertical -->
+        <line
+          x1="325"
+          y1="375"
+          x2="550"
+          y2="375"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- horizontal -->
+        <!-- cloisons salle de bain / chambre-->
+        <line
+          x1="425"
+          y1="300"
+          x2="425"
+          y2="375"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- vertical -->
+        <line
+          x1="375"
+          y1="300"
+          x2="550"
+          y2="300"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- horizontal -->
+        <line
+          x1="375"
+          y1="50"
+          x2="375"
+          y2="300"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- vertical -->
+        <!-- cloisons cuisine -->
+        <line
+          x1="250"
+          y1="400"
+          x2="250"
+          y2="550"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- vertical -->
+        <line
+          x1="50"
+          y1="400"
+          x2="250"
+          y2="400"
+          stroke="black"
+          stroke-width="2"
+        />
+        <!-- horizontal -->
+
+        <!-- Noms des pièces -->
+        <text x="150" y="300">Salle / Salon</text>
+        <text x="130" y="475">Cuisine</text>
+        <text x="430" y="200">Chambre</text>
+        <text x="430" y="335">Salle de bain</text>
+
+        <!-- radiateurs -->
+        <!--
       <rect class="radiateur" x="70" y="200" width="30" height="10" rx="3" fill="orange"/>  salle jardin -->
-      <!--
+        <!--
       <rect class="radiateur" x="325" y="50" width="30" height="10" rx="3" fill="orange"/>  salon jardin -->
-      <!--
+        <!--
       <rect class="radiateur" x="200" y="390" width="30" height="10" rx="3" fill="orange"/>  salle cuisine -->
-      <!--
+        <!--
       <rect class="radiateur" x="240" y="410" width="10" height="30" rx="3" fill="orange"/>  cuisine -->
-      <!--
+        <!--
       <rect class="radiateur" x="500" y="50" width="30" height="10" rx="3" fill="orange"/>  chambre -->
-      <!--
+        <!--
       <rect class="radiateur" x="315" y="500" width="10" height="30" rx="3" fill="orange"/>  entrée -->
-      <!--
+        <!--
       <rect class="radiateur" x="540" y="325" width="10" height="30" rx="3" fill="orange"/>  Salle de bain -->
 
-    <!-- new -->
-    <rect id="radiateurs">
-    {% for r in radiateurs %}
-        <rect class="radiateur" data-id="{{ r.id }}" data-nom="{{ r.nom }}" data-temp="{{ r.temp }}" x="{{ r.x }}" y="{{ r.y }}" width="{{ r.width }}" height="{{ r.height }}" rx="3" fill="orange"/>
-        </rect>
-    {% endfor %}
-</rect>
+        <!-- new -->
+          {% for r in radiateurs %}
+          <rect
+            class="radiateur"
+            data-id="{{ r.id }}"
+            data-nom="{{ r.nom }}"
+            data-temp="{{ r.temp }}"
+            x="{{ r.x }}"
+            y="{{ r.y }}"
+            width="{{ r.width }}"
+            height="{{ r.height }}"
+            rx="3"
+            fill="orange"
+          />
+          {% endfor %}
+      </svg>
 
-
-</svg>
-
-    <!-- new -->
-        <!--
+      <!-- new -->
+      <!--
     <div id="radiateurs">
     {% for r in radiateurs %}
         <div class="radiateur" data-id="{{ r.id }}" data-nom="{{ r.nom }}" data-temp="{{ r.temp }}"/>
@@ -134,51 +244,52 @@
 </div>
             -->
 
-<!-- Fenêtre modale -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h2 id="nomRadiateur"></h2>
-        <p>Température actuelle : <span id="tempRadiateur"></span> °C</p>
-        <input type="number" id="newTemp" min="5" max="30" step="0.5">
-        <button id="applyTemp">Appliquer</button>
-    </div>
-</div>
+      <!-- Fenêtre modale -->
+      <div id="modal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeModal">&times;</span>
+          <h2 id="nomRadiateur"></h2>
+          <p>Température actuelle : <span id="tempRadiateur"></span> °C</p>
+          <input type="number" id="newTemp" min="5" max="30" step="0.5" />
+          <button id="applyTemp">Appliquer</button>
+        </div>
+      </div>
 
-<script>
-const modal = document.getElementById('modal');
-const nomRadiateur = document.getElementById('nomRadiateur');
-const tempRadiateur = document.getElementById('tempRadiateur');
-const newTemp = document.getElementById('newTemp');
-const applyTemp = document.getElementById('applyTemp');
+      <script>
+        const modal = document.getElementById("modal");
+        const nomRadiateur = document.getElementById("nomRadiateur");
+        const tempRadiateur = document.getElementById("tempRadiateur");
+        const newTemp = document.getElementById("newTemp");
+        const applyTemp = document.getElementById("applyTemp");
 
-document.querySelectorAll('.radiateur').forEach(el => {
-    el.addEventListener('click', () => {
-        nomRadiateur.textContent = el.dataset.nom;
-        tempRadiateur.textContent = el.dataset.temp;
-        newTemp.value = el.dataset.temp;
-        modal.style.display = "block";
-    });
-});
+        document.querySelectorAll(".radiateur").forEach((el) => {
+          el.addEventListener("click", () => {
+            nomRadiateur.textContent = el.dataset.nom;
+            tempRadiateur.textContent = el.dataset.temp;
+            newTemp.value = el.dataset.temp;
+            modal.style.display = "block";
+          });
+        });
 
-document.getElementById('closeModal').onclick = () => {
-    modal.style.display = "none";
-};
+        document.getElementById("closeModal").onclick = () => {
+          modal.style.display = "none";
+        };
 
-window.onclick = (event) => {
-    if (event.target === modal) modal.style.display = "none";
-};
+        window.onclick = (event) => {
+          if (event.target === modal) modal.style.display = "none";
+        };
 
-applyTemp.onclick = () => {
-    alert(`Nouvelle température pour ${nomRadiateur.textContent} : ${newTemp.value} °C`);
-    modal.style.display = "none";
-    // Ici tu peux envoyer la valeur au serveur avec fetch()
-};
-</script>
-<!-- end new -->
-    
-    <a href="/">Home</a>
-  </header>
-</body>
+        applyTemp.onclick = () => {
+          alert(
+            `Nouvelle température pour ${nomRadiateur.textContent} : ${newTemp.value} °C`
+          );
+          modal.style.display = "none";
+          // Ici tu peux envoyer la valeur au serveur avec fetch()
+        };
+      </script>
+      <!-- end new -->
+
+      <a href="/">Home</a>
+    </header>
+  </body>
 </html>
-
