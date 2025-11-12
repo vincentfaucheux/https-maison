@@ -31,9 +31,6 @@
         padding: 10px;
         margin: 10px;
         cursor: pointer;
-        /*-- remove --*/
-        /*width: 200px;*/
-        /*-- end remove --*/
         text-align: center;
         display: inline-block;
       }
@@ -200,76 +197,73 @@
         <text x="430" y="335">Salle de bain</text>
 
         <!-- radiateurs -->
-        <!--
-      <rect class="radiateur" x="70" y="200" width="30" height="10" rx="3" fill="orange"/>  salle jardin -->
-        <!--
-      <rect class="radiateur" x="325" y="50" width="30" height="10" rx="3" fill="orange"/>  salon jardin -->
-        <!--
-      <rect class="radiateur" x="200" y="390" width="30" height="10" rx="3" fill="orange"/>  salle cuisine -->
-        <!--
-      <rect class="radiateur" x="240" y="410" width="10" height="30" rx="3" fill="orange"/>  cuisine -->
-        <!--
-      <rect class="radiateur" x="500" y="50" width="30" height="10" rx="3" fill="orange"/>  chambre -->
-        <!--
-      <rect class="radiateur" x="315" y="500" width="10" height="30" rx="3" fill="orange"/>  entrée -->
-        <!--
-      <rect class="radiateur" x="540" y="325" width="10" height="30" rx="3" fill="orange"/>  Salle de bain -->
-
-
-
-      
-        <!-- new -->
         {% for r in radiateurs %}
         <rect
           class="radiateur"
+          id="{{ r.id }}"
           data-id="{{ r.id }}"
+          nom="{{ r.nom }}"
           data-nom="{{ r.nom }}"
-          data-temp="{{ r.temp }}"
+          data-state="{{ r.state }}"
+          data-schedule="{{ r.schedule }}"
           x="{{ r.x }}"
           y="{{ r.y }}"
           width="{{ r.width }}"
           height="{{ r.height }}"
           rx="3"
-          fill="orange"
         />
         {% endfor %}
       </svg>
 
-      <!-- new -->
-      <!--
-    <div id="radiateurs">
-    {% for r in radiateurs %}
-        <div class="radiateur" data-id="{{ r.id }}" data-nom="{{ r.nom }}" data-temp="{{ r.temp }}"/>
-            🔥 {{ r.nom }}<br>
-            Température : {{ r.temp }} °C
-        </div>
-    {% endfor %}
-</div>
-            -->
 
       <!-- Fenêtre modale -->
       <div id="modal" class="modal">
         <div class="modal-content">
           <span class="close" id="closeModal">&times;</span>
           <h2 id="nomRadiateur"></h2>
-          <p>Température actuelle : <span id="tempRadiateur"></span> °C</p>
-          <input type="number" id="newTemp" min="5" max="30" step="0.5" />
-          <button id="applyTemp">Appliquer</button>
+          <p>Etat actuel : <span id="StateRadiateur"></span></p>
+          <input type="number" id="newState" min="0" max="3" step="1" />
+          <button id="applyState">Appliquer</button>
         </div>
       </div>
 
       <script>
         const modal = document.getElementById("modal");
         const nomRadiateur = document.getElementById("nomRadiateur");
-        const tempRadiateur = document.getElementById("tempRadiateur");
-        const newTemp = document.getElementById("newTemp");
-        const applyTemp = document.getElementById("applyTemp");
+        const StateRadiateur = document.getElementById("StateRadiateur");
+        const newState = document.getElementById("newState");
+        const applyState= document.getElementById("applyState");
+
+        // Dictionnaire de correspondance valeur → couleur
+        const couleurs = {
+          0: "black",
+          1: "blue",
+          2: "yellow",
+          3: "red"
+        };
+
+        function ChangeRadiateurColor() {
+          console.log("Changing radiateur colors...");
+          // Boucle sur les rectangles SVG
+          for (let i = 1; i <= 7; i++) {
+            console.log(`try radiateur ${i}`);
+            const rect = document.getElementById(i.toString());
+            if (rect) {
+              console.log(`radiateur ${i}: etat: ${rect.dataset.state}`);
+              const couleur = couleurs[ rect.dataset.state] || "gray"; // défaut si valeur inconnue
+              rect.setAttribute("fill", couleur);
+            }
+            else {
+              console.warn(`Rectangle avec l'ID ${i} non trouvé.`);
+            } 
+          }
+        };
 
         document.querySelectorAll(".radiateur").forEach((el) => {
           el.addEventListener("click", () => {
             nomRadiateur.textContent = el.dataset.nom;
-            tempRadiateur.textContent = el.dataset.temp;
-            newTemp.value = el.dataset.temp;
+            StateRadiateur.textContent = el.dataset.state;
+            newState.value = el.dataset.state;
             modal.style.display = "block";
           });
         });
@@ -282,7 +276,7 @@
           if (event.target === modal) modal.style.display = "none";
         };
 
-        applyTemp.onclick = () => {
+        applyState.onclick = () => {
           const targetEl = document.querySelector(
             `.radiateur[data-nom="${nomRadiateur.textContent}"]`
           );
@@ -294,11 +288,13 @@
           }
 
           fetch(
-            `/radiateur/${encodeURIComponent(radiateurId)}/set-temperature`,
+            `/radiateur/${encodeURIComponent(radiateurId)}/set-NewState`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ temp: parseFloat(newTemp.value) }),
+              body: JSON.stringify({ 
+                state: parseInt(newState.value) 
+              }),
             }
           )
             .then((res) => {
@@ -307,16 +303,19 @@
             })
             .then((data) => {
               // Met à jour l'affichage et le dataset local
-              if (targetEl) targetEl.dataset.temp = newTemp.value;
-              tempRadiateur.textContent = newTemp.value;
-              alert(`Température mise à jour : ${newTemp.value} °C`);
+              if (targetEl) targetEl.dataset.state = newState.value;
+              StateRadiateur.textContent = newState.value;
+              alert(`État mis à jour : ${newState.value}`);
               modal.style.display = "none";
+              ChangeRadiateurColor();
             })
             .catch((err) => {
               console.error(err);
-              alert("Échec de la mise à jour de la température.");
+              alert("Échec de la mise à jour de l'état.");
             });
         };
+
+        ChangeRadiateurColor();
       </script>
       <!-- end new -->
 
