@@ -86,14 +86,14 @@
         gap: 10px;              /* espace entre les items*/
       } 
 
-      select {
+      #mode-combo {
         width: 100px;
         padding: 8px;
         margin-top: 8px;
       }
 
       /* sélection par ID */
-      #h-select, #m-select {
+      #h-combo, #m-combo {
         width: 60px;
       } 
 
@@ -249,6 +249,9 @@
           data-nom="{{ r.nom }}"
           data-state="{{ r.state }}"
           data-nom_state =""
+          data-groupe="{{ r.groupe}}"
+          data-forceheure="{{r.timeforce.heure}}"
+          data-forceminute="{{r.timeforce.minute}}"
           data-schedule="{{ r.schedule }}"
           x="{{ r.x }}"
           y="{{ r.y }}"
@@ -282,58 +285,27 @@
           <p>Etat actuel : <span id="ModifStateRadiateur"></span></p>
           <div class="groups-column">
             <div class="items-row">
-              <label for="mode-select">Nouveau mode :</label>
-              <select id="mode-select">
-                <option value="off">Off</option>
-                <option value="confort">Confort</option>
-                <option value="eco">Éco</option>
-                <option value="hors-gel">Hors gel</option>
+              <label>Nouveau mode :</label>
+              <!-- Combobox pour les états-->
+              <select id="mode-Combo">
+                <!-- Options ajoutées dynamiquement en JS -->
               </select>
             </div>
             <div class="times-column">
               <label for="duree-select">Selection de la durée :</label>
               <div class="items-row">
-                <label for="h-select">Heures :</label>
-                <select id="h-select">
-                  <!-- Heures 00 à 23 -->
-                  <option value="00">00</option>
-                  <option value="01">01</option>
-                  <option value="02">02</option>
-                  <option value="03">03</option>
-                  <option value="04">04</option>
-                  <option value="05">05</option>
-                  <option value="06">06</option>
-                  <option value="07">07</option>
-                  <option value="08">08</option>
-                  <option value="09">09</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                  <option value="19">19</option>
-                  <option value="20">20</option>
-                  <option value="21">21</option>
-                  <option value="22">22</option>
-                  <option value="23">23</option>
+                <label>Heures :</label>
+                <select id="h-combo">
+                  <!-- Options ajoutées dynamiquement en JS -->
                 </select>
 
-                <label for="m-select">Minutes :</label>
-                <select id="m-select">
-                  <option value="00">00</option>
-                  <option value="15">15</option>
-                  <option value="30">30</option>
-                  <option value="45">45</option>
+                <label>Minutes :</label>
+                <select id="m-combo">
+                  <!-- Options ajoutées dynamiquement en JS -->
                 </select>
               </div>
             </div>
           </div>
-
-          <input type="number" id="newState" min="0" max="3" step="1" />
 
           <div class="button-column">
             <button id="Apply_modif_req">Modifier</button>
@@ -349,11 +321,13 @@
         const MainStateRadiateur = document.getElementById("MainStateRadiateur");
         const ModifNomRadiateur = document.getElementById("ModifNomRadiateur");
         const ModifStateRadiateur = document.getElementById("ModifStateRadiateur");
-        const newState = document.getElementById("newState");
         const modify_req = document.getElementById("modify_req");
         const config_req = document.getElementById("config_req");
         const apply_modif_req = document.getElementById("Apply_modif_req");
-
+        const ModeCombo = document.getElementById("mode-Combo");
+        const HCombo = document.getElementById("h-combo");
+        const MCombo = document.getElementById("m-combo");
+        
         // Dictionnaire de correspondance valeur → couleur
         const couleurs = {
           0: "black",
@@ -387,7 +361,6 @@
           el.addEventListener("click", () => {
             MainNomRadiateur.textContent = el.dataset.nom;
             MainStateRadiateur.textContent = el.dataset.nom_state;
-            newState.value = el.dataset.state;
             MainModal.style.display = "block";
           });
         });
@@ -409,6 +382,48 @@
           MainModal.style.display = "none";
           ModifNomRadiateur.textContent = MainNomRadiateur.textContent;
           ModifStateRadiateur.textContent = MainStateRadiateur.textContent;
+
+          ModeCombo.innerHTML = "";
+          const ModeOptions = ["Off", "Confort", "Éco", "Hors gel"];
+          ModeOptions.forEach(opt => {
+            const optionElement = document.createElement("option");
+            optionElement.value = ModeOptions.indexOf(opt);
+            optionElement.textContent = opt;
+            ModeCombo.appendChild(optionElement);
+          });
+          // Définir la valeur initiale
+          ModeCombo.value = MainStateRadiateur.textContent === "Off" ? 0 :
+                           MainStateRadiateur.textContent === "Confort" ? 1 :
+                           MainStateRadiateur.textContent === "Éco" ? 2 :
+                           MainStateRadiateur.textContent === "Hors gel" ? 3 : 0; 
+
+          // Remplir les combobox heures
+          HCombo.innerHTML = "";
+          const ForceHeureOptions = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", 
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+          ForceHeureOptions.forEach(opt => {
+            const optionElement = document.createElement("option");
+            optionElement.value = ForceHeureOptions.indexOf(opt);
+            optionElement.textContent = opt;
+            HCombo.appendChild(optionElement);
+          });
+          //definir la valeur initiale
+          HCombo.value = document.querySelector(
+            `.radiateur[data-nom="${MainNomRadiateur.textContent}"]`).dataset.forceheure;
+
+          // Remplir les combobox minutes
+          MCombo.innerHTML = "";
+          const ForceMinuteOptions = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+          ForceMinuteOptions.forEach(opt => {
+            const optionElement = document.createElement("option");
+            optionElement.value = ForceMinuteOptions.indexOf(opt) * 5;
+            optionElement.textContent = opt;
+            MCombo.appendChild(optionElement);
+          });
+          //definir la valeur initiale
+          MCombo.value = ((document.querySelector(
+            `.radiateur[data-nom="${MainNomRadiateur.textContent}"]`).dataset.forceminute) /5) * 5;
+
           ModifModal.style.display = "block";
         };
 
@@ -427,25 +442,32 @@
             return;
           }
 
-          fetch(
-            `/radiateur/${encodeURIComponent(radiateurId)}/set-NewState`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                state: parseInt(newState.value) 
-              }),
-            }
+          if((HCombo.value != 0) || (MCombo.value != 0)){
+            fetch(
+              `/radiateur/${encodeURIComponent(radiateurId)}/set-NewState`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                  state: parseInt(ModeCombo.value),
+                  forceheure: parseInt(HCombo.value),
+                  forceminute: parseInt(MCombo.value)
+                }),
+              }
           )
             .then((res) => {
               if (!res.ok) throw new Error("Erreur réseau");
               return res.json().catch(() => ({}));
             })
             .then((data) => {
-              // Met à jour l'affichage et le dataset local
-              if (targetEl) targetEl.dataset.state = newState.value;
-              MainStateRadiateur.textContent = newState.value;
-              console.log(`État mis à jour : ${newState.value}`);
+
+              if (targetEl) {
+                targetEl.dataset.state = ModeCombo.value;
+                targetEl.dataset.forceheure = HCombo.value;
+                targetEl.dataset.forceminute = MCombo.value;  
+              }
+              MainStateRadiateur.textContent = ModeCombo.value;
+              console.log(`État mis à jour : ${ModeCombo.value}`);
               ModifModal.style.display = "none";
               ChangeRadiateurColor();
             })
@@ -453,6 +475,12 @@
               console.error(err);
               alert("Échec de la mise à jour de l'état.");
             });
+          }
+          else{
+            ModifModal.style.display = "none";
+            console.log("Pas de forcage.");
+            return;
+          }
         };
 
         ChangeRadiateurColor();
