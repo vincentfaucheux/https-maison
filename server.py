@@ -55,6 +55,28 @@ RADIATEUR_CONFIGS : dict[int, dict[str,Any]] = {
         },
 }
 
+PIECE_CONFIGS = {
+    1: {  "x":"150",
+          "y":"300",
+          "nom": "Pièces a vivre"
+        },
+    2:  {
+          "x":"130",
+          "y":"475",
+          "nom": "Cuisine"
+        },
+    3:  {
+          "x":"430",
+          "y":"200",
+          "nom": "Chambre"
+        },
+    4:  {
+          "x":"430",
+          "y":"335",
+          "nom": "Salle de bain"
+        }
+}
+
 RADIATEUR_STATES = {
     1: 1,  # 0=off, 1=conf, 2=eco, 3=hors gel
     2: 1,
@@ -86,7 +108,7 @@ def accueil():
 def rezdechausse():
 
     # build the list for HTML
-    resp_list = []
+    html_list = { "radiateurs": [], "pieces": [] }
     for id, radiateur_data in RADIATEUR_CONFIGS.items():
         radiateur_data = radiateur_data.copy()
         radiateur_data['id'] = id
@@ -97,13 +119,18 @@ def rezdechausse():
             ("07:00", "conf"),
             ("23:00", "eco")
         ]
-        resp_list.append(radiateur_data)
+        html_list["radiateurs"].append(radiateur_data)
 
-    return render_template('RezDeChausse.html', radiateurs=resp_list)
+    for id, piece_data in PIECE_CONFIGS.items():
+        piece_data = piece_data.copy()
+        piece_data['id'] = id
+        html_list["pieces"].append(piece_data)
+
+    return render_template('RezDeChausse.html', radiateurs=html_list["radiateurs"], pieces=html_list["pieces"])
 
 
-@app.route('/radiateur/<radiateur_id>/set-NewState', methods=["POST"])
-def set_new_state(radiateur_id: str):
+@app.route('/radiateur/<radiateur_id>/set-NewRadiateurState', methods=["POST"])
+def set_new_radiateurstate(radiateur_id: str):
     # get the parameter
     new_state = request.json.get("state")
     force_heure = request.json.get("forceheure")
@@ -115,6 +142,25 @@ def set_new_state(radiateur_id: str):
         "heure": force_heure,
         "minute": force_minute
     }
+    return {"status": "success", "state": new_state}, 200
+
+
+@app.route('/piece/<piece_id>/set-NewGroupeState', methods=["POST"])
+def set_new_piece_state(piece_id: str):
+    # get the parameter
+    new_state = request.json.get("state")
+    force_heure = request.json.get("forceheure")
+    force_minute = request.json.get("forceminute")
+
+    # update all radiateurs in the piece
+    NomPiece = PIECE_CONFIGS[int(piece_id)]["nom"]
+    for id, radiateur_data in RADIATEUR_CONFIGS.items():
+        if radiateur_data["groupe"] == NomPiece:
+            RADIATEUR_STATES[id] = new_state
+            RADIATEUR_TIME_FORCE[id] = { 
+                "heure": force_heure,
+                "minute": force_minute
+            }
     return {"status": "success", "state": new_state}, 200
 
 
