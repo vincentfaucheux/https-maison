@@ -116,8 +116,10 @@ def rezdechausse():
         radiateur_data['timeforce'] = RADIATEUR_TIME_FORCE[id]
         # Example schedule
         radiateur_data['schedule'] = [
-            ("07:00", "conf"),
-            ("23:00", "eco")
+            { "heure": 0, "minute": 0, "mode": 2},
+            { "heure": 7, "minute": 0, "mode": 1},
+            { "heure": 23, "minute": 0, "mode": 2},
+            { "heure": 24, "minute": 0, "mode": 2}
         ]
         html_list["radiateurs"].append(radiateur_data)
 

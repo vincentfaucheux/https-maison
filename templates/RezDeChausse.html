@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rez de chaussée</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
       header {
         display: flex;
@@ -54,6 +58,7 @@
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
       }
+
       .modal-content {
         background: #fff;
         margin: 10% auto;
@@ -62,11 +67,20 @@
         border-radius: 8px;
         text-align: center;
       }
+      
       /* Empiler les boutons verticalement */
       .button-column {
         margin-top: 40px;
         display: flex;
         flex-direction: column; /* empile verticalement */
+        gap: 10px;              /* espace entre les boutons */
+      } 
+      
+      /* Empiler les boutons horizontalement */
+      .button-column {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: column; /* empile horizontalement */
         gap: 10px;              /* espace entre les boutons */
       } 
 
@@ -79,7 +93,7 @@
       } 
       
       /* Empiler les items verticalement */
-      .groups-column{
+      .items-column{
         text-align: left;
         display: flex;
         flex-direction: column; /* empile verticalement */
@@ -94,7 +108,7 @@
         gap: 10px;              /* espace entre les items*/
       } 
 
-      #mode-combo {
+      #mode-combo, #jour-combo {
         width: 100px;
         padding: 8px;
         margin-top: 8px;
@@ -294,7 +308,7 @@
           <span class="close" id="closeModal_Modif">&times;</span>
           <h2 id="ModifNom"></h2>
           <p>Etat actuel : <span id="ModifState"></span></p>
-          <div class="groups-column">
+          <div class="items-column">
             <div class="items-row">
               <label>Nouveau mode :</label>
               <!-- Combobox pour les états-->
@@ -325,14 +339,44 @@
       </div>
 
 
+      <!-- Fenêtre modale Configurer -->
+      <div id="ConfigModal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeModal_Config">&times;</span>
+          <h2 id="ConfigNom"></h2>
+          <div class="items-column">
+            <div class="items-row">
+              <label>Jour :</label>
+              <!-- Combobox pour les états-->
+              <select id="jour-Combo">
+                <!-- Options ajoutées dynamiquement en JS -->
+              </select>
+            </div>
+            <label>Graphe mode / heure :</label>
+            <div class="modal-body">
+              <canvas id="etatGraph" width="800" height="300"></canvas>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="Plus_config_req">+</button>
+            <button id="Minus_config_req">-</button>
+            <button id="Apply_config_req">Apply</button>
+          </div>
+        </div>
+      </div>
+
+
       <!-- retour page précédente -->
       <a href="/">Home</a>
 
       <script>
         const MainModal = document.getElementById("MainModal");
         const ModifModal = document.getElementById("ModifModal");
+        const ConfigModal = document.getElementById("ConfigModal");
         const MainNom = document.getElementById("MainNom");
         const ModifNom = document.getElementById("ModifNom");
+        const ConfigNom = document.getElementById("ConfigNom");
         const MainState = document.getElementById("MainState");
         const ModifState = document.getElementById("ModifState");
         const modify_req = document.getElementById("modify_req");
@@ -341,11 +385,16 @@
         const ModeCombo = document.getElementById("mode-Combo");
         const HCombo = document.getElementById("h-combo");
         const MCombo = document.getElementById("m-combo");
-      
+        const JourCombo = document.getElementById("jour-Combo");
+        const apply_config_req = document.getElementById("Apply_config_req");
+        const plus_config_req = document.getElementById("Plus_config_req");
+        const minus_config_req = document.getElementById("Minus_config_req");
+
         let forceheure = 0;
         let forceminute = 0;
         let itempointer = null;
         let IsGroupe = false;
+        let Schedule = [];
 
         // Dictionnaire de correspondance valeur → couleur
         const couleurs = {
@@ -384,6 +433,12 @@
             forceminute = el.dataset.forceminute;
             itempointer = el;
             IsGroupe = false;
+            let ScheduleString = el.dataset.schedule;
+            ScheduleString = ScheduleString.replace(/'/g, '"');   // conversion rapide vers JSON valide
+            Schedule = JSON.parse(ScheduleString);
+            for( let i = 0; i < Schedule.length; i++ ){
+              console.log(`schedule ${i}: heure: ${Schedule[i].heure} mode: ${Schedule[i].mode}`);
+            }
             MainModal.style.display = "block";
           });
         });
@@ -398,6 +453,7 @@
                 MainState.textContent = item.dataset.nom_state;
                 forceheure = item.dataset.forceheure;
                 forceminute = item.dataset.forceminute;
+                Schedule = item.dataset.schedule;
                 return true; // arrêter la boucle some
               }
             }) === false){
@@ -419,10 +475,15 @@
         document.getElementById("closeModal_Modif").onclick = () => {
           ModifModal.style.display = "none";
         };
+        
+        document.getElementById("closeModal_Config").onclick = () => {
+          ConfigModal.style.display = "none";
+        };
 
         window.onclick = (event) => {
           if (event.target === MainModal) MainModal.style.display = "none";
           if (event.target === ModifModal) ModifModal.style.display = "none";
+          if (event.target === ConfigModal) ConfigModal.style.display = "none";
         };
 
         modify_req.onclick = () => {
@@ -472,8 +533,77 @@
           ModifModal.style.display = "block";
         };
 
+        function LoadGraphModeTime(){
+          // definir les axes du graphe
+          const heures = Schedule.map(entry => entry.heure);
+          const modes = Schedule.map(entry => entry.mode);  
+          // Création du graphique
+          let chartModeTime = null;
+
+          //document.getElementById('ConfigModal').addEventListener('shown.bs.modal', function () {
+            // Pour éviter plusieurs initialisations
+            //if (chartModeTime) return;
+
+            const ctx = document.getElementById('etatGraph').getContext('2d');
+            chartModeTime = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: heures,
+                datasets: [{
+                  label: 'Mode',
+                  data: modes,
+                  stepped: true,
+                  borderColor: 'blue',
+                  borderwidth: 2,
+                  fill: false,
+                }],
+              },
+              options: {
+                animation: false,
+                responsive: true,
+                scales: {
+                  y: {
+                    min: 0,
+                    max: nom_state.length - 1,
+                    beginAtZero: true,
+                    ticks: {
+                      callback: value => nom_state[value],
+                      stepSize: 1,
+                    },
+                  },
+                  x: {
+                    min: 0,
+                    max: 24,
+                    title: {
+                      display: true,
+                      text: 'Heures'
+                    }
+                  }
+                }
+              }
+            });
+          //});
+        } 
+
         config_req.onclick = () => {
-          alert("Fonction de configuration non encore implémentée.");
+          MainModal.style.display = "none";
+          ConfigNom.textContent = MainNom.textContent;
+
+          // Remplir les combobox jours
+          JourCombo.innerHTML = "";
+          const JourOptions = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+          JourOptions.forEach(opt => {
+            const optionElement = document.createElement("option");
+            optionElement.value = JourOptions.indexOf(opt);
+            optionElement.textContent = opt;
+            JourCombo.appendChild(optionElement);
+          });
+          // Définir la valeur initiale
+          JourCombo.value = 0; // Par défaut Lundi
+          //Charger le graphe
+          LoadGraphModeTime();
+
+          ConfigModal.style.display = "block";
         };
 
         function OnClickModifyRadiateur() {
@@ -567,6 +697,19 @@
             console.log("Pas de forcage.");
             return;
           }
+        };
+
+        apply_config_req.onclick = () => {
+            ModifModal.style.display = "none";
+            alert("Apply config.");
+        };
+
+        plus_config_req.onclick = () => {
+            alert("plus.");
+        };
+
+        minus_config_req.onclick = () => {
+            alert("minus.");
         };
 
         ChangeRadiateurColor();
