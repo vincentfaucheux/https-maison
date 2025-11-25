@@ -97,6 +97,135 @@ RADIATEUR_TIME_FORCE = {
     7: { "heure": 0, "minute": 0 }, 
 }
 
+RADIATEUR_SCHEDULE = {
+    1: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    2: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    3: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    4: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    5: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    6: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+    7: {
+        "Lundi": [
+        { "heure": 7, "minute": 0, "mode": 1},
+        { "heure": 23, "minute": 0, "mode": 2}
+        ],
+        "Mardi": [
+        ],
+        "Mercredi": [
+        ],
+        "Jeudi": [
+        ],  
+        "Vendredi": [
+        ],
+        "Samedi": [
+        ],
+        "Dimanche": [
+        ]   
+    },
+}
+
 
 @app.route('/')
 
@@ -115,12 +244,7 @@ def rezdechausse():
         radiateur_data['state'] = RADIATEUR_STATES[id]
         radiateur_data['timeforce'] = RADIATEUR_TIME_FORCE[id]
         # Example schedule
-        radiateur_data['schedule'] = [
-            { "heure": 0, "minute": 0, "mode": 2},
-            { "heure": 7, "minute": 0, "mode": 1},
-            { "heure": 23, "minute": 0, "mode": 2},
-            { "heure": 24, "minute": 0, "mode": 2}
-        ]
+        radiateur_data['schedule'] = RADIATEUR_SCHEDULE[id]
         html_list["radiateurs"].append(radiateur_data)
 
     for id, piece_data in PIECE_CONFIGS.items():

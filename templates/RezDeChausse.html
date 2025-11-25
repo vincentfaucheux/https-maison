@@ -4,9 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rez de chaussée</title>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
       header {
@@ -64,6 +61,15 @@
         margin: 10% auto;
         padding: 20px;
         width: 300px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .modal-content-config {
+        background: #fff;
+        margin: 10% auto;
+        padding: 1px;
+        width: 650px;
         border-radius: 8px;
         text-align: center;
       }
@@ -341,7 +347,7 @@
 
       <!-- Fenêtre modale Configurer -->
       <div id="ConfigModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content-config">
           <span class="close" id="closeModal_Config">&times;</span>
           <h2 id="ConfigNom"></h2>
           <div class="items-column">
@@ -354,7 +360,7 @@
             </div>
             <label>Graphe mode / heure :</label>
             <div class="modal-body">
-              <canvas id="etatGraph" width="800" height="300"></canvas>
+              <canvas id="etatGraph" width="626" height="300"></canvas>
             </div>
           </div>
 
@@ -411,6 +417,9 @@
           2: "Eco",
           3: "Hors gel"
         };
+
+        //liste des jours de la semaine
+        const JoursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
         function ChangeRadiateurColor() {
           console.log("Changing radiateur colors...");
@@ -533,57 +542,87 @@
           ModifModal.style.display = "block";
         };
 
-        function LoadGraphModeTime(){
-          // definir les axes du graphe
-          const heures = Schedule.map(entry => entry.heure);
-          const modes = Schedule.map(entry => entry.mode);  
+        function LoadGraphModeTime( NumJour) {
+          //value -> nom du jour
+          let Jour = JoursSemaine[NumJour];
+          //trier suivant les heures croissantes
+          Schedule[ Jour].sort((a, b) => a.heure - b.heure);
           // Création du graphique
-          let chartModeTime = null;
-
-          //document.getElementById('ConfigModal').addEventListener('shown.bs.modal', function () {
-            // Pour éviter plusieurs initialisations
-            //if (chartModeTime) return;
-
-            const ctx = document.getElementById('etatGraph').getContext('2d');
-            chartModeTime = new Chart(ctx, {
-              type: 'line',
-              data: {
-                labels: heures,
-                datasets: [{
-                  label: 'Mode',
-                  data: modes,
-                  stepped: true,
-                  borderColor: 'blue',
-                  borderwidth: 2,
-                  fill: false,
-                }],
-              },
-              options: {
-                animation: false,
-                responsive: true,
-                scales: {
-                  y: {
-                    min: 0,
-                    max: nom_state.length - 1,
-                    beginAtZero: true,
-                    ticks: {
-                      callback: value => nom_state[value],
-                      stepSize: 1,
-                    },
-                  },
-                  x: {
-                    min: 0,
-                    max: 24,
-                    title: {
-                      display: true,
-                      text: 'Heures'
-                    }
-                  }
-                }
-              }
-            });
-          //});
-        } 
+          const Canvas = document.querySelector("#etatGraph");
+          const ctx = Canvas.getContext("2d");
+          // properties
+          let width = Canvas.width;
+          let height = Canvas.height;
+          console.log(`canvas, width= ${width}, height= ${height}`);
+          // Effacer le canvas
+          ctx.clearRect(0, 0, width, height); 
+          //dessiner le cadre
+          ctx.strokeStyle = "black";
+          ctx.strokeRect(1, 1, width - 1, height - 1);
+          // Dessiner l'axe horizontal'
+          ctx.beginPath();
+          ctx.moveTo(40, height - 50);
+          ctx.lineTo(width - 10, height - 50);
+          ctx.strokeStyle = "black";
+          ctx.stroke();
+          //dessiner les creneaux d'heure
+          for (let h = 0; h <= 24; h += 1) {
+            let x = 40 + (h * 24);
+            ctx.beginPath();
+            ctx.moveTo(x, height - 52);
+            ctx.lineTo(x, height - 45);
+            ctx.stroke();
+            // Ajouter les étiquettes horaires
+            ctx.fillStyle = "black";
+            ctx.font = "10px Arial";
+            ctx.fillText(h.toString().padStart(2, '0'), x - 5, height - 30);
+          }
+          //ecrire les modes
+          for (let m = 0; m <= 3; m += 1) {
+            let y = height - 60 - (m * 50);
+            ctx.fillStyle = "black";
+            ctx.font = "10px Arial";
+            ctx.fillText(nom_state[m],2, y + 3);
+          }
+          // Dessiner les points et les lignes
+          ctx.beginPath();
+          //init
+          let CurrentMode = 1;
+          let CurrentHeure = 0;
+          let NextMode = 1;
+          let NextHeure = 24;
+          //pour boucler, récupéter la dernière entrée
+          if (Schedule[ Jour].length > 0){
+            CurrentMode = Schedule[ Jour][(Schedule[ Jour].length) - 1].mode;
+          }
+          for (let i = 0; i < Schedule[ Jour].length; i++) {
+            NextMode = Schedule[ Jour][ i].mode;
+            NextHeure = Schedule[ Jour][ i].heure;
+            if( CurrentMode !== NextMode){
+              let x1 = 40 + (CurrentHeure * 24);
+              let x2 = 40 + (NextHeure * 24);
+              let y1 = height - 60 - (CurrentMode *50);
+              let y2 = height - 60 - (NextMode * 50);
+              //ligne horizontale
+              ctx.moveTo(x1, y1);
+              ctx.lineTo(x2, y1);
+              //ligne verticale
+              ctx.moveTo(x2, y1);
+              ctx.lineTo(x2, y2);
+              CurrentMode = NextMode;
+              CurrentHeure = NextHeure;
+            }
+          }
+          // ligne finale jusqu'à 24h
+          if( CurrentHeure < 24){
+            let x1 = 40 + (CurrentHeure * 24);
+            let x2 = 40 + (24 * 24);
+            let y1 = height - 60 - (CurrentMode *50);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y1);
+          }
+          ctx.stroke(); 
+        }
 
         config_req.onclick = () => {
           MainModal.style.display = "none";
@@ -591,20 +630,24 @@
 
           // Remplir les combobox jours
           JourCombo.innerHTML = "";
-          const JourOptions = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
-          JourOptions.forEach(opt => {
+          JoursSemaine.forEach(opt => {
             const optionElement = document.createElement("option");
-            optionElement.value = JourOptions.indexOf(opt);
+            optionElement.value = JoursSemaine.indexOf(opt);
             optionElement.textContent = opt;
             JourCombo.appendChild(optionElement);
           });
           // Définir la valeur initiale
           JourCombo.value = 0; // Par défaut Lundi
           //Charger le graphe
-          LoadGraphModeTime();
+          LoadGraphModeTime( JourCombo.value );
 
           ConfigModal.style.display = "block";
         };
+
+        document.getElementById("jour-Combo").addEventListener("change", function(){
+          console.log(`Jour selectionné: ${JoursSemaine[this.value]}`);
+          LoadGraphModeTime( this.value );
+        });
 
         function OnClickModifyRadiateur() {
           fetch(
