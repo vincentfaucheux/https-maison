@@ -290,6 +290,16 @@ def set_new_piece_state(piece_id: str):
     return {"status": "success", "state": new_state}, 200
 
 
+@app.route('/radiateur/<radiateur_id>/set-NewRadiateurConfig', methods=["POST"])
+def set_new_radiateurconfig(radiateur_id: str):
+    # get the parameter
+    RadSchedule = request.json.get("DayConfigs")
+
+    # save the new state to the RadiateurState list
+    RADIATEUR_SCHEDULE[int(radiateur_id)] = RadSchedule
+    return {"status": "success", "state": "1"}, 200
+
+
 if __name__ == '__main__':
     app.run(host='192.168.1.33',
             ssl_context=('../LocalRsaKey/domoserv+2.pem', '../LocalRsaKey/domoserv+2-key.pem'), 
