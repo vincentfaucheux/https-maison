@@ -60,7 +60,7 @@
         background: #fff;
         margin: 10% auto;
         padding: 20px;
-        width: 300px;
+        width: 400px;
         border-radius: 8px;
         text-align: center;
       }
@@ -69,7 +69,7 @@
         background: #fff;
         margin: 10% auto;
         padding: 1px;
-        width: 650px;
+        width: 600px;
         border-radius: 8px;
         text-align: center;
       }
@@ -314,33 +314,36 @@
           <span class="close" id="closeModal_Modif">&times;</span>
           <h2 id="ModifNom"></h2>
           <p>Etat actuel : <span id="ModifState"></span></p>
-          <div class="items-column">
-            <div class="items-row">
-              <label>Nouveau mode :</label>
-              <!-- Combobox pour les états-->
-              <select id="mode-Combo">
-                <!-- Options ajoutées dynamiquement en JS -->
-              </select>
-            </div>
-            <div class="times-column">
-              <label for="duree-select">Selection de la durée :</label>
+          <fieldset>
+            <legend>Modifier une fois</legend>
+            <div class="items-column">
               <div class="items-row">
-                <label>Heures :</label>
-                <select id="h-combo">
-                  <!-- Options ajoutées dynamiquement en JS -->
-                </select>
-
-                <label>Minutes :</label>
-                <select id="m-combo">
+                <label>Nouveau mode :</label>
+                <!-- Combobox pour les états-->
+                <select id="mode-Combo">
                   <!-- Options ajoutées dynamiquement en JS -->
                 </select>
               </div>
-            </div>
-          </div>
+              <div class="times-column">
+                <label for="duree-select">Selection de la durée :</label>
+                <div class="items-row">
+                  <label>Heures :</label>
+                  <select id="h-combo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
 
-          <div class="button-column">
-            <button id="Apply_modif_req">Modifier</button>
-          </div>
+                  <label>Minutes :</label>
+                  <select id="m-combo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-column">
+              <button id="Apply_modif_req">Modifier</button>
+            </div>
+          </fieldset>
         </div>
       </div>
 
@@ -358,12 +361,25 @@
                 <!-- Options ajoutées dynamiquement en JS -->
               </select>
             </div>
-            <label>Graphe mode / heure :</label>
-            <div class="zoneCanvas" style="position: relative; width:626px; height:300px;">
-              <canvas id="etatGraph" width="626" height="300" style="position: rabsolute; left:0; top:0;"></canvas>
-              <canvas id="posMouse" width="626" height="300" style="position: absolute; left:0; top:0; pointer-events: none;"></canvas>
-            </div>
+            <fieldset>
+              <legend>Graphe mode / heure</legend>
+              <div class="canvas-row" style="display: flex; gap: 0px;">
+                <canvas id="OrdonTitle" width="40" height="300"></canvas>
+                <div class="canvas-column" style="display: flex; flex-direction: column; gap: 0px;">
+                  <div class="zoneCanvas" style="position: relative; width:500px; height:245px;">
+                    <canvas id="etatGraph" width="500" height="245" style="position: rabsolute; left:0; top:0;"></canvas>
+                    <canvas id="posMouse" width="500" height="245" style="position: absolute; left:0; top:0; pointer-events: none;"></canvas>
+                  </div>
+                  <canvas id="AbscisTitle" width="500" height="55"></canvas>
+                </div>
+              </div>
+            </fieldset>
           </div>
+
+          <fieldset>
+            <legend>Points de changement</legend>
+            <div id="zone-labels"></div>
+          </fieldset>
 
           <div class="button-row">
             <button id="Plus_config_req">+</button>
@@ -380,17 +396,22 @@
           <span class="close" id="closeModal_DelPoint">&times;</span>
           <h2 id="DelPointNom"></h2>
           <h2 id="DelPointJour"></h2>
-          <div class="items-column">
-            <div class="items-row">
-              <label>Delete:</label>
-              <!-- Combobox pour les points -->
-              <select id="DelPointCombo">
-                <!-- Options ajoutées dynamiquement en JS -->
-              </select>
+          <fieldset>
+            <legend>Delete</legend>
+            <div class="items-column">
+              <div class="items-row">
+                <label>Points:</label>
+                <!-- Combobox pour les points -->
+                <select id="DelPointCombo">
+                  <!-- Options ajoutées dynamiquement en JS -->
+                </select>
+              </div>
             </div>
-          </div>
 
-          <button id="DelPoint_config_req">Apply</button>
+            <div class="button-column">
+              <button id="DelPoint_config_req">Delete</button>
+            </div>
+          </fieldset>
         </div>
       </div>
 
@@ -401,32 +422,94 @@
           <span class="close" id="closeModal_AddPoint">&times;</span>
           <h2 id="AddPointNom"></h2>
           <h2 id="AddPointJour"></h2>
-          <div class="items-column">
-            <div class="items-row">
-              <label>Nouveau mode :</label>
-              <!-- Combobox pour les états-->
-              <select id="AddModeCombo">
-                <!-- Options ajoutées dynamiquement en JS -->
-              </select>
-            </div>
-            <div class="times-column">
-              <label for="AddTimeSelect">Heure changement :</label>
+          <fieldset>
+            <legend>Add</legend>
+            <div class="items-column">
               <div class="items-row">
-                <label>Heures :</label>
-                <select id="AddHeureCombo">
-                  <!-- Options ajoutées dynamiquement en JS -->
-                </select>
-
-                <label>Minutes :</label>
-                <select id="AddMinuteCombo">
+                <label>Nouveau mode :</label>
+                <!-- Combobox pour les états-->
+                <select id="AddModeCombo">
                   <!-- Options ajoutées dynamiquement en JS -->
                 </select>
               </div>
-            </div>
-          </div>
+              <div class="times-column">
+                <label for="AddTimeSelect">Heure changement :</label>
+                <div class="items-row">
+                  <label>Heures :</label>
+                  <select id="AddHeureCombo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
 
-          <div class="button-column">
-            <button id="AddPoint_config_req">Apply</button>
+                  <label>Minutes :</label>
+                  <select id="AddMinuteCombo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-column">
+              <button id="AddPoint_config_req">Add</button>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+
+
+      <!-- Fenêtre modale Add / delete point -->
+      <div id="AddDelPointModal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeModal_AddDelPoint">&times;</span>
+          <div class="items-column">
+            <h2 id="AddDelPointNom"></h2>
+            <h2 id="AddDelPointJour"></h2>
+            <fieldset>
+              <legend>Delete</legend>
+              <div class="items-column">
+                <div class="items-row">
+                  <label>Points:</label>
+                  <!-- Combobox pour les points -->
+                  <select id="AddDelPointCombo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="button-column">
+                <button id="DelPoint_AddDelconfig_req">Delete</button>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Add</legend>
+              <div class="items-column">
+                <div class="items-row">
+                  <label>Nouveau mode :</label>
+                  <!-- Combobox pour les états-->
+                  <select id="AddDelModeCombo">
+                    <!-- Options ajoutées dynamiquement en JS -->
+                  </select>
+                </div>
+                <div class="times-column">
+                  <label for="AddDelTimeSelect">Heure changement :</label>
+                  <div class="items-row">
+                    <label>Heures :</label>
+                    <select id="AddDelHeureCombo">
+                      <!-- Options ajoutées dynamiquement en JS -->
+                    </select>
+
+                    <label>Minutes :</label>
+                    <select id="AddDelMinuteCombo">
+                      <!-- Options ajoutées dynamiquement en JS -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="button-column">
+                <button id="AddPoint_AddDelconfig_req">Add</button>
+              </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -457,6 +540,14 @@
         let LockHeure= 0;
         let LockMinute = 0;
         let LockMode = 1;
+
+        // paramètres de transformation
+        let scale = 1;
+        let originX = 0;
+
+        // variables pour le pan
+        let isDragging = false;
+        let startX;
 
         // Dictionnaire de correspondance valeur → couleur
         const couleurs = {
@@ -603,6 +694,10 @@
         const ctx = Canvas.getContext("2d");
         const PosMouse = document.querySelector("#posMouse");
         const ctxPosMouse = PosMouse.getContext("2d");
+        const CvsOrdonTitle = document.querySelector("#OrdonTitle");
+        const CtxOrdonTitle = CvsOrdonTitle.getContext("2d");
+        const CvsAbscisTitle = document.querySelector("#AbscisTitle");
+        const CtxAbscisTitle = CvsAbscisTitle.getContext("2d");
 
         function LoadGraphModeTime( NumJour) {
           //value -> nom du jour
@@ -615,34 +710,37 @@
           console.log(`canvas, width= ${width}, height= ${height}`);
           // Effacer le canvas
           ctx.clearRect(0, 0, width, height); 
+          //appliquer zoom et translation
+          ctx.save();
+          ctx.setTransform( scale, 0, 0, 1, originX, 0);
           ctxPosMouse.clearRect(0, 0, width, height); 
-          //dessiner le cadre
-          ctx.strokeStyle = "black";
-          ctx.strokeRect(1, 1, width - 1, height - 1);
           // Dessiner l'axe horizontal'
-          ctx.beginPath();
-          ctx.moveTo(40, height - 50);
-          ctx.lineTo(width - 10, height - 50);
-          ctx.strokeStyle = "black";
-          ctx.stroke();
+          let heightCanvasAbsc = CvsAbscisTitle.height;
+          CtxAbscisTitle.clearRect(0, 0, width, heightCanvasAbsc); 
+          CtxAbscisTitle.beginPath();
+          CtxAbscisTitle.moveTo(0, heightCanvasAbsc - 50);
+          CtxAbscisTitle.lineTo(0 +((24 *12) *scale) +originX, heightCanvasAbsc - 50);
+          CtxAbscisTitle.strokeStyle = "black";
+          CtxAbscisTitle.stroke();
           //dessiner les creneaux d'heure
           for (let h = 0; h <= 24; h += 1) {
-            let x = 40 + (h * 24);
-            ctx.beginPath();
-            ctx.moveTo(x, height - 52);
-            ctx.lineTo(x, height - 45);
-            ctx.stroke();
+            let x = 0 +((h *12) *scale) +originX;
+            CtxAbscisTitle.beginPath();
+            CtxAbscisTitle.moveTo(x, heightCanvasAbsc - 52);
+            CtxAbscisTitle.lineTo(x, heightCanvasAbsc - 45);
+            CtxAbscisTitle.stroke();
             // Ajouter les étiquettes horaires
-            ctx.fillStyle = "black";
-            ctx.font = "10px Arial";
-            ctx.fillText(h.toString().padStart(2, '0'), x - 5, height - 30);
+            CtxAbscisTitle.fillStyle = "black";
+            CtxAbscisTitle.font = "10px Arial";
+            CtxAbscisTitle.fillText(h.toString().padStart(2, '0'), x - 5, heightCanvasAbsc - 30);
           }
           //ecrire les modes
+          let heightCanvasOrdon = CvsOrdonTitle.height;
           for (let m = 0; m <= 3; m += 1) {
-            let y = height - 60 - (m * 50);
-            ctx.fillStyle = "black";
-            ctx.font = "10px Arial";
-            ctx.fillText(nom_state[m],2, y + 3);
+            let y = heightCanvasOrdon - 60 - (m * 50);
+            CtxOrdonTitle.fillStyle = "black";
+            CtxOrdonTitle.font = "10px Arial";
+            CtxOrdonTitle.fillText(nom_state[m],2, y + 3);
           }
           // Dessiner les points et les lignes
           ctx.beginPath();
@@ -671,10 +769,10 @@
             NextHeure = Schedule[ Jour][ i].heure;
             NextMinute = Schedule[ Jour][ i].minute;
             if( CurrentMode !== NextMode){
-              let x1 = 40 + (CurrentHeure * 24) + ((CurrentMinute / 5) * 2);
-              let x2 = 40 + (NextHeure * 24) + ((NextMinute / 5) * 2);
-              let y1 = height - 60 - (CurrentMode *50);
-              let y2 = height - 60 - (NextMode * 50);
+              let x1 = 0 + (CurrentHeure * 12) + ((CurrentMinute / 5) * 1);
+              let x2 = 0 + (NextHeure * 12) + ((NextMinute / 5) * 1);
+              let y1 = height - 5 - (CurrentMode *50);
+              let y2 = height - 5 - (NextMode * 50);
               //ligne horizontale
               ctx.moveTo(x1, y1);
               ctx.lineTo(x2, y1);
@@ -688,81 +786,272 @@
           }
           // ligne finale jusqu'à 24h
           if( CurrentHeure < 24){
-            let x1 = 40 + (CurrentHeure * 24) + ((CurrentMinute / 5) * 2);
-            let x2 = 40 + (24 * 24);
-            let y1 = height - 60 - (CurrentMode *50);
+            let x1 = 0 + (CurrentHeure * 12) + ((CurrentMinute / 5) * 1);
+            let x2 = 0 + (24 * 12);
+            let y1 = height - 5 - (CurrentMode *50);
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y1);
           }
           ctx.stroke(); 
+
+          //init
+          CurrentMode = 1;
+          CurrentHeure = 0;
+          CurrentMinute = 0;
+          NextMode = 1;
+          NextHeure = 24;
+          NextMinute = 0;
+          const ZoneLabels = document.getElementById("zone-labels");
+          ZoneLabels.innerHTML = "";
+
+          //pour boucler, récupéter la dernière entrée du jour précédent
+          if( NumJour == 0){
+            //lundi, prendre le dimanche
+            if (Schedule[ JoursSemaine[6]].length > 0){
+              CurrentMode = Schedule[ JoursSemaine[6]][(Schedule[ JoursSemaine[6]].length) - 1].mode;
+            }
+          }
+          else{
+            //autre jour, prendre le jour précédent
+            if (Schedule[ JoursSemaine[NumJour - 1]].length > 0){
+              CurrentMode = Schedule[ JoursSemaine[NumJour - 1]][(Schedule[ JoursSemaine[NumJour - 1]].length) - 1].mode;
+            }
+          }
+          for (let i = 0; i < Schedule[ Jour].length; i++) {
+            NextMode = Schedule[ Jour][ i].mode;
+            NextHeure = Schedule[ Jour][ i].heure;
+            NextMinute = Schedule[ Jour][ i].minute;
+            const label = document.createElement("label");
+            label.textContent = 
+              NextHeure.toString().padStart(2, '0') +"H" +NextMinute.toString().padStart(2, '0') +", " +
+              nom_state[NextMode];
+            if( CurrentMode === NextMode){
+              label.textContent = label.textContent +"; Inactif"
+            }
+            ZoneLabels.appendChild(label);
+            ZoneLabels.appendChild(document.createElement("br"));
+
+            CurrentMode = NextMode;
+            CurrentHeure = NextHeure;
+            CurrentMinute = NextMinute;
+          }
         }
+
+        // ----- zoom à la molette -----
+        Canvas.addEventListener("wheel", (e) => {
+            e.preventDefault();
+
+            const zoomIntensity = 0.1;
+            const mouseX = e.offsetX;
+
+            // zoom sur le point du curseur
+            const wheel = e.deltaY < 0 ? 1 : -1;
+            const zoom = Math.exp(wheel * zoomIntensity);
+
+            scale *= zoom;
+            if( scale < 1)
+            {
+              scale = 1;
+            }
+            LoadGraphModeTime( CurJour );
+        });
+
+
+        // ----- pan (clic + glisser) -----
+        Canvas.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            startX = e.offsetX - originX;
+        });
+
+        Canvas.addEventListener("mouseup", () => {
+            isDragging = false;
+        });
 
         Canvas.addEventListener("mousemove", function(event) {
           const rect = Canvas.getBoundingClientRect();
-          const x = event.clientX - rect.left;
+          const x = (event.clientX - rect.left -originX) /scale;
           const y = event.clientY - rect.top;
+
+          if (isDragging) {
+            if((event.offsetX - startX) > 0)
+            {
+              originX = 0;
+            }
+            else
+            {
+              originX = event.offsetX - startX;
+            }
+          }
 
           // Effacer le canvas de position de la souris
           ctxPosMouse.clearRect(0, 0, PosMouse.width, PosMouse.height);
           ctxPosMouse.fillStyle = "black";
           ctxPosMouse.font = "16px Arial";
-          if((Math.floor(x) >= 40) && 
+          if((Math.floor(x) >= 0) && 
             (Math.floor(x) <= 616) &&
-            (Math.floor(y) <= (Canvas.height - 50)) && 
-            (Math.floor(y) >= (Canvas.height - 235))
+            (Math.floor(y) <= (Canvas.height - 0)) && 
+            (Math.floor(y) >= (Canvas.height - 175))
           )
           {
             //convertir l'abcisse en heure et minute
-            let curheure = Math.floor((x - 40) / 24);
-            let curminute = Math.floor(((x - 40) % 24) / 2) * 5;
+            let curheure = Math.floor((x - 0) / 12);
+            let curminute = Math.floor(((x -0) % 12) / 1) * 5;
             //convertir l'ordonnée en mode
             let curmode = 0;
-            if((Math.floor(y) <= (Canvas.height - 85) && 
-              (Math.floor(y) > (Canvas.height - 135)))){
+            if((Math.floor(y) <= (Canvas.height - 25) && 
+              (Math.floor(y) > (Canvas.height - 75)))){
               curmode = 1;
             }
-            else if((Math.floor(y) <= (Canvas.height - 135) && 
-            (Math.floor(y) > (Canvas.height - 185)))){
+            else if((Math.floor(y) <= (Canvas.height - 75) && 
+            (Math.floor(y) > (Canvas.height - 125)))){
               curmode = 2;
             }
-            else if(Math.floor(y) <= (Canvas.height - 185)){
+            else if(Math.floor(y) <= (Canvas.height - 125)){
               curmode = 3;
             }
             ctxPosMouse.fillText(`heure: ${curheure.toString().padStart(2, '0')} : ${curminute.toString().padStart(2, '0')} - mode: ${nom_state[curmode]}`, 10, 20);
+            ctxPosMouse.fillText(`posx: ${event.offsetX.toString()} ,x: ${x.toString()} ,y: ${y.toString()}`, 10, 40);
+            ctxPosMouse.fillText(`origine: ${originX.toString()} ,scale: ${scale.toString()}`, 10, 60);
           }
+
+          if (isDragging) {
+            LoadGraphModeTime( CurJour );
+          }
+
         });
 
         Canvas.addEventListener("dblclick", function(event) {
           const rect = Canvas.getBoundingClientRect();
-          const x = event.clientX - rect.left;
+          const x = (event.clientX - rect.left -originX) /scale;
           const y = event.clientY - rect.top;
 
           // Check if within valid area
-           if((Math.floor(x) >= 40) && 
+           if((Math.floor(x) >= 0) && 
             (Math.floor(x) <= 616) &&
-            (Math.floor(y) <= (Canvas.height - 50)) && 
-            (Math.floor(y) >= (Canvas.height - 235))
+            (Math.floor(y) <= (Canvas.height - 0)) && 
+            (Math.floor(y) >= (Canvas.height - 175))
           )
           {
             //convertir l'abcisse en heure et minute
-            LockHeure = Math.floor((x - 40) / 24);
-            LockMinute = Math.floor(((x - 40) % 24) / 2) * 5;
+            LockHeure = Math.floor((x - 0) / 12);
+            LockMinute = Math.floor(((x - 0) % 12) / 1) * 5;
             //convertir l'ordonnée en mode
             LockMode = 0;
-            if((Math.floor(y) <= (Canvas.height - 85) && 
-              (Math.floor(y) > (Canvas.height - 135)))){
+            if((Math.floor(y) <= (Canvas.height - 25) && 
+              (Math.floor(y) > (Canvas.height - 75)))){
               LockMode = 1;
             }
-            else if((Math.floor(y) <= (Canvas.height - 135) && 
-            (Math.floor(y) > (Canvas.height - 185)))){
+            else if((Math.floor(y) <= (Canvas.height - 75) && 
+            (Math.floor(y) > (Canvas.height - 125)))){
               LockMode = 2;
             }
-            else if(Math.floor(y) <= (Canvas.height - 185)){
+            else if(Math.floor(y) <= (Canvas.height - 125)){
               LockMode = 3;
             }
             console.log(`Lock heure: ${LockHeure.toString().padStart(2, '0')} : ${LockMinute.toString().padStart(2, '0')} - mode: ${nom_state[LockMode]}`);
           }
+
+          //lancer la modale Add / del point
+          let Jour = JoursSemaine[CurJour];
+          AddDelPointNom.textContent = ConfigNom.textContent;
+          AddDelPointJour.textContent = `Jour: ${Jour}`;
+          // Remplir les combobox modes
+          AddDelModeCombo.innerHTML = "";
+          for (let i = 0; i <= 3; i++) {
+            const Item= document.createElement("option");
+            Item.value = i;
+            Item.textContent = nom_state[i];
+            AddDelModeCombo.appendChild(Item);
+          }
+          AddDelModeCombo.value = LockMode;
+
+          // Remplir les combobox heures
+          AddDelHeureCombo.innerHTML = "";
+          if( LockHeure >= 1) {
+            LockHeure = LockHeure -1;
+          }
+          if( LockHeure == 22) {
+            LockHeure = LockHeure -1;
+          }
+          for( let I = 0; I < 3; I++) {
+            const optionElement = document.createElement("option");
+            optionElement.value = I;
+            optionElement.textContent = (LockHeure +I).toString().padStart(2, '0');
+            AddDelHeureCombo.appendChild(optionElement);
+          }
+          AddDelHeureCombo.value = 1;
+
+          // Remplir les combobox minutes
+          AddDelMinuteCombo.innerHTML = "";
+          const ForceMinuteOptions = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+          ForceMinuteOptions.forEach(opt => {
+            const optionElement = document.createElement("option");
+            optionElement.value = ForceMinuteOptions.indexOf(opt) * 5;
+            optionElement.textContent = opt;
+            AddDelMinuteCombo.appendChild(optionElement);
+          });
+          AddDelMinuteCombo.value = LockMinute;
+
+          AddDelPointCombo.innerHTML = "";
+          let nbPoints = 0;
+          for (let i = 0; i < Schedule[ Jour].length; i++) {
+            if((Schedule[Jour][i].heure >= LockHeure) &&
+              (Schedule[Jour][i].heure <= LockHeure +2)) {
+              const Item= document.createElement("option");
+              Item.value = nbPoints;
+              nbPoints ++;
+              Item.textContent = 
+                `${Schedule[Jour][i].heure.toString().padStart(2, '0')}H${Schedule[ Jour][i].minute.toString().padStart(2, '0')} - ${nom_state[Schedule[ Jour][i].mode]}`;
+              AddDelPointCombo.appendChild(Item);
+            }
+          }
+          AddDelPointCombo.value = 0;
+
+          //afficher la fenêtre
+          AddDelPointModal.style.display = "block";
+
         });
+
+
+        document.getElementById("closeModal_AddDelPoint").onclick = () => {
+          AddDelPointModal.style.display = "none";
+        };
+
+
+        DelPoint_AddDelconfig_req.onclick = () => {
+          //value -> nom du jour
+          let Jour = JoursSemaine[CurJour];
+          const indexToDelete = parseInt(AddDelPointCombo.value);
+          if( isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= Schedule[ Jour].length){
+            alert("Index invalide.");
+            return;
+          }
+          Schedule[ Jour].splice(indexToDelete, 1);
+          alert(`Point ${indexToDelete} supprimé.`);
+          AddDelPointModal.style.display = "none";
+          LoadGraphModeTime( CurJour );
+        };
+
+        
+        AddPoint_AddDelconfig_req.onclick = () => {
+          //value -> nom du jour
+          let Jour = JoursSemaine[CurJour];
+          const newHeure = parseInt(AddDelHeureCombo.value +LockHeure);
+          const newMinute = parseInt(AddDelMinuteCombo.value);
+          const newMode = parseInt(AddDelModeCombo.value);
+          //vérifier si le point existe déjà
+          const exists = Schedule[ Jour].some(point => point.heure === newHeure && point.minute === newMinute);
+          if( exists ){
+            alert("Un point existe déjà à cette heure.");
+            return;
+          }
+          //ajouter le point
+          Schedule[ Jour].push({ heure: newHeure, minute: newMinute, mode: newMode });
+          alert(`Point ajouté: ${newHeure.toString().padStart(2, '0')}H${newMinute.toString().padStart(2, '0')} - ${nom_state[newMode]}`);
+          AddDelPointModal.style.display = "none";
+          LoadGraphModeTime( CurJour );
+        };
+
 
         config_req.onclick = () => {
           MainModal.style.display = "none";
@@ -779,6 +1068,9 @@
           // Définir la valeur initiale
           JourCombo.value = 0; // Par défaut Lundi
           CurJour = 0;
+          scale = 1;
+          originX = 0;
+          isDragging = false;          
           //Charger le graphe
           LoadGraphModeTime( JourCombo.value );
 
@@ -788,6 +1080,9 @@
         document.getElementById("jour-Combo").addEventListener("change", function(){
           console.log(`Jour selectionné: ${JoursSemaine[this.value]}`);
           CurJour = this.value;
+          scale = 1;
+          originX = 0;
+          isDragging = false;          
           LoadGraphModeTime( this.value );
         });
 
@@ -915,7 +1210,7 @@
           let Jour = JoursSemaine[CurJour];
           AddPointNom.textContent = ConfigNom.textContent;
           AddPointJour.textContent = `Jour: ${Jour}`;
-          // Remplir les combobox jours
+          // Remplir les combobox modes
           AddModeCombo.innerHTML = "";
           for (let i = 0; i <= 3; i++) {
             const Item= document.createElement("option");
@@ -951,9 +1246,12 @@
           AddPointModal.style.display = "block";
         };
 
+
         document.getElementById("closeModal_AddPoint").onclick = () => {
           AddPointModal.style.display = "none";
         };
+
+
         AddPoint_config_req.onclick = () => {
           //value -> nom du jour
           let Jour = JoursSemaine[CurJour];
@@ -978,7 +1276,7 @@
           let Jour = JoursSemaine[CurJour];
           DelPointNom.textContent = ConfigNom.textContent;
           DelPointJour.textContent = `Jour: ${Jour}`;
-          // Remplir les combobox jours
+          // Remplir la combobox points existants
           DelPointCombo.innerHTML = "";
           for (let i = 0; i < Schedule[ Jour].length; i++) {
             const Item= document.createElement("option");
