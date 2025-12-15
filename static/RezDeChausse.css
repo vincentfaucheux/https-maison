@@ -1,0 +1,125 @@
+header {
+	display: flex;
+	flex-direction: column; /* Aligne verticalement */
+	align-items: left; /* Centre horizontalement */
+	text-align: center;
+	margin: 20px;
+}
+
+header svg {
+	margin: 20px 0; /* Espace autour du dessin */
+}
+
+header a {
+	text-decoration: none;
+	color: blue;
+	margin-top: 10px;
+}
+
+body {
+	font-family: sans-serif;
+}
+
+.radiateur {
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin: 10px;
+	cursor: pointer;
+	text-align: center;
+	display: inline-block;
+}
+
+.piece {
+	font-weight: bold;
+	text-align: center;
+	fill: black;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+/* Fenêtre modale*/
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 10;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+	background: #fff;
+	margin: 10% auto;
+	padding: 20px;
+	width: 400px;
+	border-radius: 8px;
+	text-align: center;
+}
+
+.modal-content-config {
+	background: #fff;
+	margin: 10% auto;
+	padding: 1px;
+	width: 600px;
+	border-radius: 8px;
+	text-align: center;
+}
+
+/* Empiler les boutons verticalement */
+.button-column {
+	margin-top: 40px;
+	display: flex;
+	flex-direction: column; /* empile verticalement */
+	gap: 10px;              /* espace entre les boutons */
+} 
+
+/* Empiler les boutons horizontalement */
+.button-column {
+	margin-top: 40px;
+	display: flex;
+	flex-direction: column; /* empile horizontalement */
+	gap: 10px;              /* espace entre les boutons */
+} 
+
+/* Empiler les items horizontalement */
+.items-row{
+	text-align: left;
+	display: flex;
+	flex-direction: row; /* empile horizontalement */
+	gap: 10px;              /* espace entre les items*/
+} 
+
+/* Empiler les items verticalement */
+.items-column{
+	text-align: left;
+	display: flex;
+	flex-direction: column; /* empile verticalement */
+	gap: 20px;              /* espace entre les items*/
+} 
+
+/* Empiler les items times verticalement */
+.times-column{
+	text-align: left;
+	display: flex;
+	flex-direction: column; /* empile verticalement */
+	gap: 10px;              /* espace entre les items*/
+} 
+
+#mode-combo, #jour-combo {
+	width: 100px;
+	padding: 8px;
+	margin-top: 8px;
+}
+
+/* sélection par ID */
+#h-combo, #m-combo {
+	width: 60px;
+} 
+
+.close {
+	color: red;
+	float: right;
+	cursor: pointer;
+}
