@@ -333,6 +333,6 @@ def set_new_piececonfig(piece_id: str):
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.33',
+    app.run(host='192.168.1.35',
             ssl_context=('../LocalRsaKey/domoserv+2.pem', '../LocalRsaKey/domoserv+2-key.pem'), 
             port=8443)
