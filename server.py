@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request
 from typing import Any
 from data2file import write_json, read_json
+from pipes_exchanges import init_pipes, end_pipes, send_request_on_pipe
+import threading
+import time
 
 app = Flask(__name__)
 
@@ -216,6 +219,15 @@ RADIATEURS_DATA_INIT = {
 RADIATEURS_DATA = {
 }
 
+lock = threading.Lock()
+end_pipes_exchanges = False
+
+def pipe_exchanges():
+    while end_pipes_exchanges == False:
+        with lock:
+            respons =send_request_on_pipe( 1, 255, 255, "")
+            print("response ", respons)
+        time.sleep( 20)
 
 @app.route('/')
 def accueil():
@@ -333,6 +345,41 @@ def set_new_piececonfig(piece_id: str):
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.35',
-            ssl_context=('../LocalRsaKey/domoserv+2.pem', '../LocalRsaKey/domoserv+2-key.pem'), 
-            port=8443)
+    # initialisation des tubes d'échange
+    init_pipes()
+
+    # start the thread for pipe exchanges
+    t = threading.Thread(target=pipe_exchanges)
+    t.daemon = True
+    t.start()
+
+    #
+    # boucle avant arrêt du serveurl
+    #
+    bQuit = False
+    while( bQuit == False ):
+        str_input = input("Appuyer sur Q pour quitter ")
+        if(( str_input == "Q" ) or ( str_input == "q" )):
+            bQuit = True
+
+#    app.run(host='192.168.1.34',
+#            ssl_context=('../LocalRsaKey/domoserv+2.pem', '../LocalRsaKey/domoserv+2-key.pem'), 
+#            port=8443, debug=False)
+
+    #
+    # Tout fermer   
+    #
+    end_pipes_exchanges = True
+    t.join()
+    end_pipes()
+
+
+# en java script pour dedemander les nouvelles données
+#-------------------------------------------------------
+#setInterval(() => {
+#    fetch("/data")
+#        .then(r => r.json())
+#        .then(data => {
+#            document.body.innerText = JSON.stringify(data);
+#        });
+#}, 2000);
