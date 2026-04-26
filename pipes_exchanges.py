@@ -15,16 +15,16 @@ def on_data():
     global buf_reply
     global reply_length
     data = ep.read()
-    if( len(buf_reply) < 3 ):
+    if( len(buf_reply) < 5 ):
         buf_reply += data
-        if( len(buf_reply) >= 3 ):
-            reply_length = buf_reply[1] << 8 | buf_reply[2]
-            if( len(buf_reply) - 3 >= reply_length ):
+        if( len(buf_reply) >= 5 ):
+            reply_length = buf_reply[3] << 8 | buf_reply[4]
+            if( len(buf_reply) - 5 >= reply_length ):
                 # tout reçu
                 bDataReceived = True
     else:
         buf_reply += data
-        if( len(buf_reply) - 3 >= reply_length ):
+        if( len(buf_reply) - 5 >= reply_length ):
             # tout reçu
             bDataReceived = True
 
@@ -125,8 +125,9 @@ def send_request_on_pipe(cmd, floors, items, str_data):
         #
         while not bDataReceived:
             if( ep.is_data_received() == True ):
-                bDataReceived = True
-                on_data()
+                while not bDataReceived:
+                    on_data()
+                    time.sleep(0.01)
             time.sleep(0.01)
         bDataReceived = False
         print("Cmd " + str( struct.unpack_from( ">B", buf_reply, 0)))

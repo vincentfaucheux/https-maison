@@ -1,324 +1,277 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rez de chaussée</title>
-    
-    <!-- Lien vers le fichier CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='RezDeChausse.css') }}">
-  </head>
-  <body>
-    <header>
-      <h1>Rez de chaussée</h1>
 
-      <!-- plan du rez de chaussee -->
-      <svg width="600" height="600">
-        <!-- murs extérieurs -->
-        <line
-          x1="50"
-          y1="550"
-          x2="550"
-          y2="550"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- devant -->
-        <line
-          x1="50"
-          y1="200"
-          x2="50"
-          y2="550"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- gauche -->
-        <line
-          x1="550"
-          y1="50"
-          x2="550"
-          y2="550"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- droit -->
-        <line
-          x1="50"
-          y1="200"
-          x2="275"
-          y2="200"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- jardin salle -->
-        <line
-          x1="275"
-          y1="50"
-          x2="275"
-          y2="200"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- renfoncement salon -->
-        <line
-          x1="275"
-          y1="50"
-          x2="550"
-          y2="50"
-          stroke="black"
-          stroke-width="4"
-        />
-        <!-- jardin chambre -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rez de chaussée</title>
 
-        <!-- cloisons garage -->
-        <line
-          x1="325"
-          y1="375"
-          x2="325"
-          y2="550"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- vertical -->
-        <line
-          x1="325"
-          y1="375"
-          x2="550"
-          y2="375"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- horizontal -->
-        <!-- cloisons salle de bain / chambre-->
-        <line
-          x1="425"
-          y1="300"
-          x2="425"
-          y2="375"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- vertical -->
-        <line
-          x1="375"
-          y1="300"
-          x2="550"
-          y2="300"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- horizontal -->
-        <line
-          x1="375"
-          y1="50"
-          x2="375"
-          y2="300"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- vertical -->
-        <!-- cloisons cuisine -->
-        <line
-          x1="250"
-          y1="400"
-          x2="250"
-          y2="550"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- vertical -->
-        <line
-          x1="50"
-          y1="400"
-          x2="250"
-          y2="400"
-          stroke="black"
-          stroke-width="2"
-        />
-        <!-- horizontal -->
+  <!-- Lien vers le fichier CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='RezDeChausse.css') }}">
+</head>
 
-        <!-- Noms des pièces -->
-        {% for p in pieces %}
-        <text 
-          class="piece"
-          id="{{ p.id }}"
-          x="{{ p.x }}" 
-          y="{{ p.y }}">{{ p.nom }}</text> 
+<body>
+  <header>
+    <h1>Rez de chaussée</h1>
 
-        {% endfor %}
+    <!-- plan du rez de chaussee -->
+    <svg width="600" height="600">
+      <!-- murs extérieurs -->
+      <line x1="50" y1="550" x2="550" y2="550" stroke="black" stroke-width="4" />
+      <!-- devant -->
+      <line x1="50" y1="200" x2="50" y2="550" stroke="black" stroke-width="4" />
+      <!-- gauche -->
+      <line x1="550" y1="50" x2="550" y2="550" stroke="black" stroke-width="4" />
+      <!-- droit -->
+      <line x1="50" y1="200" x2="275" y2="200" stroke="black" stroke-width="4" />
+      <!-- jardin salle -->
+      <line x1="275" y1="50" x2="275" y2="200" stroke="black" stroke-width="4" />
+      <!-- renfoncement salon -->
+      <line x1="275" y1="50" x2="550" y2="50" stroke="black" stroke-width="4" />
+      <!-- jardin chambre -->
 
-        <!-- radiateurs -->
-        {% for r in radiateurs %}
-        <rect
-          class="radiateur"
-          id="{{ r.id }}"
-          nom="{{ r.nom }}"
-          data-nom="{{ r.nom }}"
-          data-state="{{ r.state }}"
-          data-nom_state =""
-          data-groupe="{{ r.groupe}}"
-          data-forceheure="{{r.timeforce.heure}}"
-          data-forceminute="{{r.timeforce.minute}}"
-          data-schedule="{{ r.schedule }}"
-          x="{{ r.x }}"
-          y="{{ r.y }}"
-          width="{{ r.width }}"
-          height="{{ r.height }}"
-          rx="3"
-        />
-        {% endfor %}
-      </svg>
+      <!-- cloisons garage -->
+      <line x1="325" y1="375" x2="325" y2="550" stroke="black" stroke-width="2" />
+      <!-- vertical -->
+      <line x1="325" y1="375" x2="550" y2="375" stroke="black" stroke-width="2" />
+      <!-- horizontal -->
+      <!-- cloisons salle de bain / chambre-->
+      <line x1="425" y1="300" x2="425" y2="375" stroke="black" stroke-width="2" />
+      <!-- vertical -->
+      <line x1="375" y1="300" x2="550" y2="300" stroke="black" stroke-width="2" />
+      <!-- horizontal -->
+      <line x1="375" y1="50" x2="375" y2="300" stroke="black" stroke-width="2" />
+      <!-- vertical -->
+      <!-- cloisons cuisine -->
+      <line x1="250" y1="400" x2="250" y2="550" stroke="black" stroke-width="2" />
+      <!-- vertical -->
+      <line x1="50" y1="400" x2="250" y2="400" stroke="black" stroke-width="2" />
+      <!-- horizontal -->
+
+      <!-- Noms des pièces -->
+      {% for p in pieces %}
+      <text class="piece" id="{{ p.Id }}" x="{{ p.X }}" y="{{ p.Y }}">{{ p.Nom }}</text>
+
+      {% endfor %}
+
+      <!-- radiateurs -->
+      {% for r in radiateurs %}
+      <rect class="radiateur" id="{{ r.Id }}" nom="{{ r.Nom }}" data-nom="{{ r.Nom }}" data-state="{{ r.Mode }}"
+        data-nom_state="" data-groupe="{{ r.Groupe}}" data-forceheure="{{r.Force.Heure}}"
+        data-forceminute="{{r.Force.Minute}}" data-schedule="{{ r.Schedule }}" x="{{ r.X }}" y="{{ r.Y }}"
+        width="{{ r.Width }}" height="{{ r.Height }}" rx="3" />
+      {% endfor %}
+    </svg>
 
 
-      <!-- Fenêtre modale main -->
-      <div id="MainModal" class="modal">
-        <div class="modal-content">
-          <span class="close" id="closeModal_Main">&times;</span>
-          <h2 id="MainNom"></h2>
-          <p>Etat actuel : <span id="MainState"></span></p>
-          <div class="button-column">
-            <button id="modify_req">Modifie une fois</button>
-            <button id="config_req">Configure</button>
-          </div>
+    <!-- Fenêtre modale main -->
+    <div id="MainModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal_Main">&times;</span>
+        <h2 id="MainNom"></h2>
+        <p>Etat actuel : <span id="MainState"></span></p>
+        <div class="button-column">
+          <button id="modify_req">Modifie une fois</button>
+          <button id="config_req">Configure</button>
         </div>
       </div>
+    </div>
 
 
-      <!-- Fenêtre modale Modifier -->
-      <div id="ModifModal" class="modal">
-        <div class="modal-content">
-          <span class="close" id="closeModal_Modif">&times;</span>
-          <h2 id="ModifNom"></h2>
-          <p>Etat actuel : <span id="ModifState"></span></p>
-          <fieldset>
-            <legend>Modifier une fois</legend>
-            <div class="items-column">
-              <div class="items-row">
-                <label>Nouveau mode :</label>
-                <!-- Combobox pour les états-->
-                <select id="mode-Combo">
-                  <!-- Options ajoutées dynamiquement en JS -->
-                </select>
-              </div>
-              <div class="times-column">
-                <label for="duree-select">Selection de la durée :</label>
-                <div class="items-row">
-                  <label>Heures :</label>
-                  <select id="h-combo">
-                    <!-- Options ajoutées dynamiquement en JS -->
-                  </select>
-
-                  <label>Minutes :</label>
-                  <select id="m-combo">
-                    <!-- Options ajoutées dynamiquement en JS -->
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="button-column">
-              <button id="Apply_modif_req">Modifie</button>
-            </div>
-          </fieldset>
-        </div>
-      </div>
-
-
-      <!-- Fenêtre modale Configurer -->
-      <div id="ConfigModal" class="modal">
-        <div class="modal-content-config">
-          <span class="close" id="closeModal_Config">&times;</span>
-          <h2 id="ConfigNom"></h2>
+    <!-- Fenêtre modale Modifier -->
+    <div id="ModifModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal_Modif">&times;</span>
+        <h2 id="ModifNom"></h2>
+        <p>Etat actuel : <span id="ModifState"></span></p>
+        <fieldset>
+          <legend>Modifier une fois</legend>
           <div class="items-column">
             <div class="items-row">
-              <label>Jour :</label>
+              <label>Nouveau mode :</label>
               <!-- Combobox pour les états-->
-              <select id="jour-Combo">
+              <select id="mode-Combo">
                 <!-- Options ajoutées dynamiquement en JS -->
               </select>
             </div>
-            <fieldset>
-              <legend>Graphe mode / heure</legend>
-              <div class="canvas-row" style="display: flex; gap: 0px;">
-                <canvas id="OrdonTitle" width="40" height="300"></canvas>
-                <div class="canvas-column" style="display: flex; flex-direction: column; gap: 0px;">
-                  <div class="zoneCanvas" style="position: relative; width:500px; height:245px;">
-                    <canvas id="etatGraph" width="500" height="245" style="position: rabsolute; left:0; top:0;"></canvas>
-                    <canvas id="posMouse" width="500" height="245" style="position: absolute; left:0; top:0; pointer-events: none;"></canvas>
-                  </div>
-                  <canvas id="AbscisTitle" width="500" height="55"></canvas>
-                </div>
+            <div class="times-column">
+              <label for="duree-select">Selection de la durée :</label>
+              <div class="items-row">
+                <label>Heures :</label>
+                <select id="h-combo">
+                  <!-- Options ajoutées dynamiquement en JS -->
+                </select>
+
+                <label>Minutes :</label>
+                <select id="m-combo">
+                  <!-- Options ajoutées dynamiquement en JS -->
+                </select>
               </div>
-            </fieldset>
+            </div>
           </div>
 
+          <div class="button-column">
+            <button id="Apply_modif_req">Modifie</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+
+    <!-- Fenêtre modale Configurer -->
+    <div id="ConfigModal" class="modal">
+      <div class="modal-content-config">
+        <span class="close" id="closeModal_Config">&times;</span>
+        <h2 id="ConfigNom"></h2>
+        <div class="items-column">
+          <div class="items-row">
+            <label>Jour :</label>
+            <!-- Combobox pour les états-->
+            <select id="jour-Combo">
+              <!-- Options ajoutées dynamiquement en JS -->
+            </select>
+          </div>
           <fieldset>
-            <legend>Points de changement</legend>
-            <div id="zone-labels"></div>
+            <legend>Graphe mode / heure</legend>
+            <div class="canvas-row" style="display: flex; gap: 0px;">
+              <canvas id="OrdonTitle" width="40" height="300"></canvas>
+              <div class="canvas-column" style="display: flex; flex-direction: column; gap: 0px;">
+                <div class="zoneCanvas" style="position: relative; width:500px; height:245px;">
+                  <canvas id="etatGraph" width="500" height="245" style="position: rabsolute; left:0; top:0;"></canvas>
+                  <canvas id="posMouse" width="500" height="245"
+                    style="position: absolute; left:0; top:0; pointer-events: none;"></canvas>
+                </div>
+                <canvas id="AbscisTitle" width="500" height="55"></canvas>
+              </div>
+            </div>
           </fieldset>
+        </div>
 
-          <div class="button-row">
-            <button id="Plus_config_req">+</button>
-            <button id="Minus_config_req">-</button>
-            <button id="Duplicate_config_req">Duplique</button>
-            <button id="Apply_config_req">Applique</button>
-          </div>
+        <fieldset>
+          <legend>Points de changement</legend>
+          <div id="zone-labels"></div>
+        </fieldset>
+
+        <div class="button-row">
+          <button id="Plus_config_req">+</button>
+          <button id="Minus_config_req">-</button>
+          <button id="Duplicate_config_req">Duplique</button>
+          <button id="Apply_config_req">Applique</button>
         </div>
       </div>
+    </div>
 
 
-      <!-- Fenêtre modale delete point -->
-      <div id="DelPointModal" class="modal">
-        <div class="modal-content">
-          <span class="close" id="closeModal_DelPoint">&times;</span>
-          <h2 id="DelPointNom"></h2>
-          <h2 id="DelPointJour"></h2>
+    <!-- Fenêtre modale delete point -->
+    <div id="DelPointModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal_DelPoint">&times;</span>
+        <h2 id="DelPointNom"></h2>
+        <h2 id="DelPointJour"></h2>
+        <fieldset>
+          <legend>Efface</legend>
+          <div class="items-column">
+            <div class="items-row">
+              <label>Points:</label>
+              <!-- Combobox pour les points -->
+              <select id="DelPointCombo">
+                <!-- Options ajoutées dynamiquement en JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="button-column">
+            <button id="DelPoint_config_req">Efface</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+
+    <!-- Fenêtre modale Add point -->
+    <div id="AddPointModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal_AddPoint">&times;</span>
+        <h2 id="AddPointNom"></h2>
+        <h2 id="AddPointJour"></h2>
+        <fieldset>
+          <legend>Ajout</legend>
+          <div class="items-column">
+            <div class="items-row">
+              <label>Nouveau mode :</label>
+              <!-- Combobox pour les états-->
+              <select id="AddModeCombo">
+                <!-- Options ajoutées dynamiquement en JS -->
+              </select>
+            </div>
+            <div class="times-column">
+              <label for="AddTimeSelect">Heure changement :</label>
+              <div class="items-row">
+                <label>Heures :</label>
+                <select id="AddHeureCombo">
+                  <!-- Options ajoutées dynamiquement en JS -->
+                </select>
+
+                <label>Minutes :</label>
+                <select id="AddMinuteCombo">
+                  <!-- Options ajoutées dynamiquement en JS -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="button-column">
+            <button id="AddPoint_config_req">Ajout</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+
+    <!-- Fenêtre modale Add / delete point -->
+    <div id="AddDelPointModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal_AddDelPoint">&times;</span>
+        <div class="items-column">
+          <h2 id="AddDelPointNom"></h2>
+          <h2 id="AddDelPointJour"></h2>
           <fieldset>
             <legend>Efface</legend>
             <div class="items-column">
               <div class="items-row">
                 <label>Points:</label>
                 <!-- Combobox pour les points -->
-                <select id="DelPointCombo">
+                <select id="AddDelPointCombo">
                   <!-- Options ajoutées dynamiquement en JS -->
                 </select>
               </div>
             </div>
 
             <div class="button-column">
-              <button id="DelPoint_config_req">Efface</button>
+              <button id="DelPoint_AddDelconfig_req">Efface</button>
             </div>
           </fieldset>
-        </div>
-      </div>
 
-
-      <!-- Fenêtre modale Add point -->
-      <div id="AddPointModal" class="modal">
-        <div class="modal-content">
-          <span class="close" id="closeModal_AddPoint">&times;</span>
-          <h2 id="AddPointNom"></h2>
-          <h2 id="AddPointJour"></h2>
           <fieldset>
             <legend>Ajout</legend>
             <div class="items-column">
               <div class="items-row">
                 <label>Nouveau mode :</label>
                 <!-- Combobox pour les états-->
-                <select id="AddModeCombo">
+                <select id="AddDelModeCombo">
                   <!-- Options ajoutées dynamiquement en JS -->
                 </select>
               </div>
               <div class="times-column">
-                <label for="AddTimeSelect">Heure changement :</label>
+                <label for="AddDelTimeSelect">Heure changement :</label>
                 <div class="items-row">
                   <label>Heures :</label>
-                  <select id="AddHeureCombo">
+                  <select id="AddDelHeureCombo">
                     <!-- Options ajoutées dynamiquement en JS -->
                   </select>
 
                   <label>Minutes :</label>
-                  <select id="AddMinuteCombo">
+                  <select id="AddDelMinuteCombo">
                     <!-- Options ajoutées dynamiquement en JS -->
                   </select>
                 </div>
@@ -326,77 +279,20 @@
             </div>
 
             <div class="button-column">
-              <button id="AddPoint_config_req">Ajout</button>
+              <button id="AddPoint_AddDelconfig_req">Ajout</button>
             </div>
           </fieldset>
         </div>
       </div>
+    </div>
 
+    <!-- retour page précédente -->
+    <a href="/">Home</a>
 
-      <!-- Fenêtre modale Add / delete point -->
-      <div id="AddDelPointModal" class="modal">
-        <div class="modal-content">
-          <span class="close" id="closeModal_AddDelPoint">&times;</span>
-          <div class="items-column">
-            <h2 id="AddDelPointNom"></h2>
-            <h2 id="AddDelPointJour"></h2>
-            <fieldset>
-              <legend>Efface</legend>
-              <div class="items-column">
-                <div class="items-row">
-                  <label>Points:</label>
-                  <!-- Combobox pour les points -->
-                  <select id="AddDelPointCombo">
-                    <!-- Options ajoutées dynamiquement en JS -->
-                  </select>
-                </div>
-              </div>
-
-              <div class="button-column">
-                <button id="DelPoint_AddDelconfig_req">Efface</button>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Ajout</legend>
-              <div class="items-column">
-                <div class="items-row">
-                  <label>Nouveau mode :</label>
-                  <!-- Combobox pour les états-->
-                  <select id="AddDelModeCombo">
-                    <!-- Options ajoutées dynamiquement en JS -->
-                  </select>
-                </div>
-                <div class="times-column">
-                  <label for="AddDelTimeSelect">Heure changement :</label>
-                  <div class="items-row">
-                    <label>Heures :</label>
-                    <select id="AddDelHeureCombo">
-                      <!-- Options ajoutées dynamiquement en JS -->
-                    </select>
-
-                    <label>Minutes :</label>
-                    <select id="AddDelMinuteCombo">
-                      <!-- Options ajoutées dynamiquement en JS -->
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="button-column">
-                <button id="AddPoint_AddDelconfig_req">Ajout</button>
-              </div>
-            </fieldset>
-          </div>
-        </div>
-      </div>
-
-      <!-- retour page précédente -->
-      <a href="/">Home</a>
-
-      <!-- script associé à l'HTML -->
+    <!-- script associé à l'HTML -->
     <script src="{{ url_for('static', filename='RezDeChausse.js') }}"></script>
-	  
-    </header>
-  </body>
+
+  </header>
+</body>
+
 </html>
