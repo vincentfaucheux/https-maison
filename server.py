@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
+from flask import jsonify
 from typing import Any
-from data2json import write_json2file, read_string2fulljson, read_string2partialjson
+from data2json import write_json2file, read_string2fulljson, read_string2partialjson, write_json2string
 from pipes_exchanges import init_pipes, end_pipes, send_request_on_pipe
 import threading
 import time
@@ -97,6 +98,7 @@ PIECE_CONFIGS = {
     }
 }
 
+
 RADIATEURS_DATA_INIT = {
     "Maison": {
         "Etage_0": {
@@ -110,13 +112,13 @@ RADIATEURS_DATA_INIT = {
                 "Radiateur_7": 1,
             },
             "Force": {
-                "Radiateur_1": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_2": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_3": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_4": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_5": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_6": { "Heure": 0, "Minute": 0 }, 
-                "Radiateur_7": { "Heure": 0, "Minute": 0 }, 
+                "Radiateur_1": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_2": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_3": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_4": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_5": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_6": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_7": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
             },
             "Schedule": {
                 "Radiateur_1": {
@@ -243,6 +245,9 @@ html_list_groundfloor = { "Radiateurs": [], "Pieces": [] }
 
 lock = threading.Lock()
 end_pipes_exchanges = False
+serv2main_dictionary = {}
+serv2main_msg = ""
+serv2main_trigger = False
 
 def init_html_list_groundfloor_pieces():
     global html_list_groundfloor
@@ -251,6 +256,27 @@ def init_html_list_groundfloor_pieces():
         piece_data = piece_data.copy()
         piece_data['Id'] = id
         html_list_groundfloor["Pieces"].append(piece_data)
+
+def update_main_app( floor, action, heaters):
+    global serv2main_dictionary
+    global RADIATEURS_DATA
+    global serv2main_trigger
+    global lock
+    global serv2main_msg
+    values = {}
+    for heater in heaters: 
+        values[heater] = RADIATEURS_DATA["Maison"][floor][action][heater]
+    path = [ "Maison", floor, action ]
+    for key in reversed(path):
+        values = { key: values }
+    serv2main_dictionary = values
+    with lock:
+        retcode, msg = write_json2string(serv2main_dictionary)
+        if retcode != 0:
+            print( msg)
+            return
+        serv2main_msg = msg
+        serv2main_trigger = True
 
 def updage_groundfloor_radiateurs():
     global RADIATEURS_DATA
@@ -268,13 +294,16 @@ def updage_groundfloor_radiateurs():
 
 def pipe_exchanges():
     global RADIATEURS_DATA
+    global serv2main_msg
+    global serv2main_trigger
+    global lock
     # échange initial, etats, force et schedule, pour tous les radiateurs
     with lock:
         respons =send_request_on_pipe( 1, 255, 255, "")
     print("response ", respons)
-    retcode, msg = read_string2fulljson(respons, RADIATEURS_DATA)
+    retcode, serv2main_msg = read_string2fulljson(respons, RADIATEURS_DATA)
     if retcode != 0:
-        print( msg)
+        print( serv2main_msg)
         #print("JSON invalide, reinitialisation des donnees")
         #RADIATEURS_DATA = RADIATEURS_DATA_INIT.copy()
     print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
@@ -284,16 +313,22 @@ def pipe_exchanges():
     time.sleep( 1)
 
     while end_pipes_exchanges == False:
-        # échanges périodiques, etats et force, pour tous les radiateurs
-        with lock:
-            respons =send_request_on_pipe( 1, 255, 3, "")
-        print("response ", respons)
-        retcode, msg = read_string2partialjson(respons, RADIATEURS_DATA)
-        if retcode != 0:
-            print( msg)
-        print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
-        print("keys RADIATEURS_DATA['Maison'] ", RADIATEURS_DATA["Maison"].keys())
-        updage_groundfloor_radiateurs()
+        if serv2main_trigger == True:
+            serv2main_trigger = False
+            respons = send_request_on_pipe( 2, 255, 255, serv2main_msg)
+            print("response ", respons)
+        else:
+            # échanges périodiques, etats et force, pour tous les radiateurs
+            with lock:
+                respons =send_request_on_pipe( 1, 255, 3, "")
+            print("response ", respons)
+            retcode, msg = read_string2partialjson(respons, RADIATEURS_DATA)
+            if retcode != 0:
+                print( msg)
+            print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
+            print("keys RADIATEURS_DATA['Maison'] ", RADIATEURS_DATA["Maison"].keys())
+            updage_groundfloor_radiateurs()
+
         time.sleep( 20)
 
 @app.route('/')
@@ -332,50 +367,71 @@ def rezdechausse():
 
     return render_template('RezDeChausse.html', radiateurs=html_list_groundfloor["Radiateurs"], pieces=html_list_groundfloor["Pieces"])
 
+@app.route('/refresh_groundfloor_data')
+def data():
+    return jsonify(html_list_groundfloor)
 
 @app.route('/radiateur/<radiateur_id>/set-NewRadiateurState', methods=["POST"])
 def set_new_radiateurstate(radiateur_id: str):
     global RADIATEURS_DATA
     # get the parameter
-    new_state = request.json.get("state")
+    force_mode = request.json.get("forcemode")
     force_heure = request.json.get("forceheure")
     force_minute = request.json.get("forceminute")
 
+    #initiate list of heaters to update in main app
+    heaters = []
+
     # save the new state to the RadiateurState list
-    RADIATEURS_DATA["Maison"]["Etage_0"]["Mode"][radiateur_id] = new_state
     RADIATEURS_DATA["Maison"]["Etage_0"]["Force"][radiateur_id] = { 
         "Heure": force_heure,
-        "Minute": force_minute
+        "Minute": force_minute,
+        "Mode": force_mode
     }
+
+    #add the heater to the list of heaters to update in main app
+    heaters.append(radiateur_id)
+
+    #request send to main app
+    update_main_app( "Etage_0", "Force", heaters)
 
     # write to file
     write_json2file(RADIATEURS_DATA)
 
-    return {"status": "success", "state": new_state}, 200
+    return {"status": "success", "mode": force_mode}, 200
 
 
 @app.route('/piece/<piece_id>/set-NewGroupeState', methods=["POST"])
 def set_new_piece_state(piece_id: str):
     global RADIATEURS_DATA
     # get the parameter
-    new_state = request.json.get("state")
+    force_mode = request.json.get("forcemode")
     force_heure = request.json.get("forceheure")
     force_minute = request.json.get("forceminute")
 
+    #initiate list of heaters to update in main app
+    heaters = []
+
     # update all radiateurs in the piece
-    NomPiece = PIECE_CONFIGS[piece_id]["Nom"]
-    for id, radiateur_data in RADIATEUR_CONFIGS.items():
+    NomPiece = PIECE_CONFIGS["Maison"]["Etage_0"][piece_id]["Nom"]
+    for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
         if radiateur_data["Groupe"] == NomPiece:
-            RADIATEURS_DATA["Maison"]["Etage_0"]["Mode"][id] = new_state
             RADIATEURS_DATA["Maison"]["Etage_0"]["Force"][id] = { 
                 "Heure": force_heure,
-                "Minute": force_minute
+                "Minute": force_minute,
+                "Mode": force_mode
             }
+
+            #add the heater to the list of heaters to update in main app
+            heaters.append(id)
+
+    #request send to main app
+    update_main_app( "Etage_0", "Force", heaters)
 
     # write to file
     write_json2file(RADIATEURS_DATA)
 
-    return {"status": "success", "state": new_state}, 200
+    return {"status": "success", "mode": force_mode}, 200
 
 
 @app.route('/radiateur/<radiateur_id>/set-NewRadiateurConfig', methods=["POST"])
@@ -384,8 +440,17 @@ def set_new_radiateurconfig(radiateur_id: str):
     # get the parameter
     RadSchedule = request.json.get("DayConfigs")
 
+    #initiate list of heaters to update in main app
+    heaters = []
+
     # save the new state to the RadiateurState list
     RADIATEURS_DATA["Maison"]["Etage_0"]["Schedule"][radiateur_id] = RadSchedule
+
+    #add the heater to the list of heaters to update in main app
+    heaters.append(radiateur_id)
+
+    #request send to main app
+    update_main_app( "Etage_0", "Schedule", heaters)
 
     # write to file
     write_json2file(RADIATEURS_DATA)
@@ -399,11 +464,20 @@ def set_new_piececonfig(piece_id: str):
     # get the parameter
     PieceSchedule = request.json.get("DayConfigs")
 
+    #initiate list of heaters to update in main app
+    heaters = []
+
     # update all radiateurs in the piece
-    NomPiece = PIECE_CONFIGS[piece_id]["Nom"]
-    for id, radiateur_data in RADIATEUR_CONFIGS.items():
+    NomPiece = PIECE_CONFIGS["Maison"]["Etage_0"][piece_id]["Nom"]
+    for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
         if radiateur_data["Groupe"] == NomPiece:
             RADIATEURS_DATA["Maison"]["Etage_0"]["Schedule"][id] = PieceSchedule
+
+            #add the heater to the list of heaters to update in main app
+            heaters.append(id)
+
+    #request send to main app
+    update_main_app( "Etage_0", "Schedule", heaters)
 
     # write to file
     write_json2file(RADIATEURS_DATA)

@@ -51,3 +51,9 @@ def deep_merge(d1, d2):
             d1[key] = value
     return d1
 
+def write_json2string(data):
+    try:
+        return 0, json.dumps(data, indent=4)
+    except (TypeError, ValueError) as e:
+        return -1, f"Data not serializable: {e}"
+

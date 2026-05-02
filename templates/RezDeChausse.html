@@ -56,9 +56,9 @@
 
       <!-- radiateurs -->
       {% for r in radiateurs %}
-      <rect class="radiateur" id="{{ r.Id }}" nom="{{ r.Nom }}" data-nom="{{ r.Nom }}" data-state="{{ r.Mode }}"
-        data-nom_state="" data-groupe="{{ r.Groupe}}" data-forceheure="{{r.Force.Heure}}"
-        data-forceminute="{{r.Force.Minute}}" data-schedule="{{ r.Schedule }}" x="{{ r.X }}" y="{{ r.Y }}"
+      <rect class="radiateur" id="{{ r.Id }}" data-nom="{{ r.Nom }}" data-state="{{ r.Mode }}" data-nom_state=""
+        data-groupe="{{ r.Groupe}}" data-forceheure="{{r.Force.Heure}}" data-forceminute="{{r.Force.Minute}}"
+        data-forcemode="{{r.Force.Mode}}" data-schedule="{{ r.Schedule }}" x="{{ r.X }}" y="{{ r.Y }}"
         width="{{ r.Width }}" height="{{ r.Height }}" rx="3" />
       {% endfor %}
     </svg>

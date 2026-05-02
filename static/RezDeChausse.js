@@ -42,14 +42,14 @@ const nom_state = {
 };
 
 //liste des heures
-const HeureOptions = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", 
-						"11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
+const HeureOptions = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+	"11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
 
 //liste des minutes (5 par 5)						
 const MinuteOptions = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
 
 //liste des jours de la semaine
-const JoursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const JoursSemaine = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 
 //Variables globales 
@@ -59,10 +59,12 @@ const JoursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi
 let ElemNom = "";
 // Lors de l'affichage d'une modale, état courant de l'élément
 let ElemEtat = 0;
-// Lors de l'affichage d'une modale, forçage de l'élément en heures et minutes, partie heures
+// Lors de l'affichage d'une modale, forçage de l'élément en heures, minutes et mode, partie heures
 let forceheure = 0;
-// Lors de l'affichage d'une modale, forçage de l'élément en heures et minutes, partie minutes
+// Lors de l'affichage d'une modale, forçage de l'élément en heures, minutes et mode, partie minutes
 let forceminute = 0;
+// Lors de l'affichage d'une modale, forçage de l'élément en heures, minutes et mode, partie mode
+let forcemode = 1;
 // Lors de l'affichage d'une modale, pointeur sur l'élément (radiateur ou piece)
 let itempointer = null;
 // Lors de l'affichage d'une modale, type élément (radiateur ou piece)
@@ -73,7 +75,7 @@ let Schedule = [];
 // Affichage du graphe de configuration, jour courant
 let CurJour = 0;
 // Affichage du graphe de configuration, heure sélectionné
-let LockHeure= 0;
+let LockHeure = 0;
 // Affichage du graphe de configuration, minute sélectionné
 let LockMinute = 0;
 // Affichage du graphe de configuration, mode sélectionné
@@ -91,6 +93,37 @@ let LockCancelIndexPoint = 0;
 //--------------
 
 // fonction
+// récupérer cycliquement les données de l'état des radiateurs et des pièces
+function updateData() {
+	fetch('https://192.168.1.34:8443/refresh_groundfloor_data')
+		.then(response => response.text())
+		.then(text => {
+			return JSON.parse(text);
+		})
+
+		.then(data => {
+			// 🔹 Mise à jour des radiateurs
+			data.Radiateurs.forEach(r => {
+				let el = document.getElementById(r.Id);
+				if (el) {
+					el.setAttribute("data-state", r.Mode);
+					el.setAttribute("data-groupe", r.Groupe);
+					el.setAttribute("data-forceheure", r.Force.Heure);
+					el.setAttribute("data-forceminute", r.Force.Minute);
+					el.setAttribute("data-forcemode", r.Force.Mode);
+				}
+				console.log(`Radiateur ${r.Id} mis à jour : Mode=${r.Mode}, Groupe=${r.Groupe}, Force=${r.Force.Mode} ${r.Force.Heure}h${r.Force.Minute}`);
+			});
+			ChangeRadiateurColor();
+		})
+
+		.catch(err => console.error("JSON ERROR :", err));
+
+}
+
+setInterval(updateData, 10000); // toutes les 10 secondes
+
+// fonction
 // Modification de la couleur du rectangle en fonction de l'état du radiateur
 function ChangeRadiateurColor() {
 	console.log("Changing radiateur colors...");
@@ -99,8 +132,8 @@ function ChangeRadiateurColor() {
 	console.log(`Found ${items.length} radiateurs.`);
 	items.forEach((item) => {
 		console.log(`radiateur ${item.id}: etat: ${item.dataset.state}`);
-		const couleur = couleurs[ item.dataset.state] || "gray"; // défaut si valeur inconnue
-		item.dataset.nom_state = nom_state[ item.dataset.state] || "Inconnu";
+		const couleur = couleurs[item.dataset.state] || "gray"; // défaut si valeur inconnue
+		item.dataset.nom_state = nom_state[item.dataset.state] || "Inconnu";
 		item.setAttribute("fill", couleur);
 	});
 };
@@ -116,6 +149,7 @@ document.querySelectorAll(".radiateur").forEach((el) => {
 		ElemEtat = el.dataset.nom_state;
 		forceheure = el.dataset.forceheure;
 		forceminute = el.dataset.forceminute;
+		forcemode = el.dataset.forcemode;
 		itempointer = el;
 		IsGroupe = false;
 		let ScheduleString = el.dataset.schedule;
@@ -124,6 +158,7 @@ document.querySelectorAll(".radiateur").forEach((el) => {
 		//for( let i = 0; i < Schedule.length; i++ ){
 		//	console.log(`schedule ${i}: heure: ${Schedule[i].heure} mode: ${Schedule[i].mode}`);
 		//}
+		console.log(`radiateur ${el.id} clicked: nom: ${ElemNom}, etat: ${ElemEtat}, forceheure: ${forceheure}, forceminute: ${forceminute}, forcemode: ${forcemode}`);
 		StartMainModal();
 	});
 });
@@ -138,21 +173,22 @@ document.querySelectorAll(".piece").forEach((el) => {
 	el.addEventListener("click", () => {
 		console.log(`piece ${el.textContent}`);
 		const items = Array.from(document.querySelectorAll(".radiateur"));
-		if(items.some((item) => {
+		if (items.some((item) => {
 			console.log(`radiateur ${item.id}: groupe: ${item.dataset.groupe}`);
-			if(item.dataset.groupe === el.textContent.trim()){
+			if (item.dataset.groupe === el.textContent.trim()) {
 				ElemEtat = item.dataset.nom_state;
 				forceheure = item.dataset.forceheure;
 				forceminute = item.dataset.forceminute;
+				forcemode = item.dataset.forcemode;
 				let ScheduleString = item.dataset.schedule;
 				ScheduleString = ScheduleString.replace(/'/g, '"');   // conversion rapide vers JSON valide
 				Schedule = JSON.parse(ScheduleString);
 				return true; // arrêter la boucle some
 			}
-		}) === false){
+		}) === false) {
 			alert("Cette pièce n'est pas un groupe.");
 		}
-		else{
+		else {
 			ElemNom = el.textContent;
 			itempointer = el;
 			IsGroupe = true;
@@ -174,7 +210,7 @@ ChangeRadiateurColor();
 function StartMainModal() {
 	MainNom.textContent = ElemNom;
 	MainState.textContent = ElemEtat;
-    MainModal.style.display = "block";
+	MainModal.style.display = "block";
 }
 
 // Evènement
@@ -224,9 +260,9 @@ function StartForceModal() {
 	}
 	// Définir la valeur initiale
 	ModeCombo.value = MainState.textContent === "Off" ? 0 :
-	   MainState.textContent === "Confort" ? 1 :
-	   MainState.textContent === "Eco" ? 2 :
-	   MainState.textContent === "Hors gel" ? 3 : 0; 
+		MainState.textContent === "Confort" ? 1 :
+			MainState.textContent === "Eco" ? 2 :
+				MainState.textContent === "Hors gel" ? 3 : 0;
 
 	// Remplir la combobox heure
 	HCombo.innerHTML = "";
@@ -248,7 +284,7 @@ function StartForceModal() {
 		MCombo.appendChild(optionElement);
 	});
 	//definir la valeur initiale
-	MCombo.value = (forceminute /5) * 5;
+	MCombo.value = Math.round(forceminute / 5) * 5;
 
 	//Afficher la modale
 	ModifModal.style.display = "block";
@@ -266,46 +302,46 @@ document.getElementById("closeModal_Modif").onclick = () => {
 // Envoie les nouvelles informations au serveur
 // Verifie le reour de l'envoi
 // Met à jour les infos locales pour le radiateur sélectionné
-function EndModifyRadiateur() {
+function EndForceRadiateur() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
 		`/radiateur/${encodeURIComponent(itempointer.id)}/set-NewRadiateurState`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ 
-				state: parseInt(ModeCombo.value),
+			body: JSON.stringify({
+				forcemode: parseInt(ModeCombo.value),
 				forceheure: parseInt(HCombo.value),
 				forceminute: parseInt(MCombo.value)
 			}),
 		}
 	)
-	
-	// Vérifie le retour de l'envoi
-	.then((res) => {
-		if (!res.ok) throw new Error("Erreur réseau");
-		return res.json().catch(() => ({}));
-	})
-	
-	// Met à jour les infos locales pour le radiateur sélectionné
-	.then((data) => {
-		if (itempointer) {
-			itempointer.dataset.state = ModeCombo.value;
-			itempointer.dataset.forceheure = HCombo.value;
-			itempointer.dataset.forceminute = MCombo.value;  
-		}
-		
-		// Affiche le nouvel état du radiateur
-		MainState.textContent = ModeCombo.value;
-		console.log(`État mis à jour : ${ModeCombo.value}`);
-		ChangeRadiateurColor();
-	})
-	
-	// En cas d'erreur, message
-	.catch((err) => {
-		console.error(err);
-		alert("Échec de la mise à jour de l'état.");
-	});          
+
+		// Vérifie le retour de l'envoi
+		.then((res) => {
+			if (!res.ok) throw new Error("Erreur réseau");
+			return res.json().catch(() => ({}));
+		})
+
+		// // Met à jour les infos locales pour le radiateur sélectionné
+		// .then((data) => {
+		// 	if (itempointer) {
+		// 		itempointer.dataset.forcemode = ModeCombo.value;
+		// 		itempointer.dataset.forceheure = HCombo.value;
+		// 		itempointer.dataset.forceminute = MCombo.value;
+		// 	}
+
+		// 	// Affiche le nouvel état du radiateur
+		// 	MainState.textContent = ModeCombo.value;
+		// 	console.log(`État mis à jour : ${ModeCombo.value}`);
+		// 	ChangeRadiateurColor();
+		// })
+
+		// En cas d'erreur, message
+		.catch((err) => {
+			console.error(err);
+			alert("Échec de la mise à jour de l'état.");
+		});
 }
 
 // fonction
@@ -313,49 +349,49 @@ function EndModifyRadiateur() {
 // Envoie les nouvelles informations au serveur
 // Verifie le reour de l'envoi
 // Met à jour les infos locales pour tous les radiateurs du groupe
-function EndModifyPiece() {
+function EndForcePiece() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
 		`/piece/${encodeURIComponent(itempointer.id)}/set-NewGroupeState`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ 
-				state: parseInt(ModeCombo.value),
+			body: JSON.stringify({
+				forcemode: parseInt(ModeCombo.value),
 				forceheure: parseInt(HCombo.value),
 				forceminute: parseInt(MCombo.value)
 			}),
 		}
 	)
-	
-	// Vérifie le retour de l'envoi
-	.then((res) => {
-		if (!res.ok) throw new Error("Erreur réseau");
-		return res.json().catch(() => ({}));
-	})
-	
-	// Met à jour les infos locales pour tous les radiateur du groupe
-	.then((data) => {
-		const items = document.querySelectorAll(".radiateur");
-		items.forEach((item) => {
-			if(item.dataset.groupe === itempointer.textContent){
-				item.dataset.state = ModeCombo.value;
-				item.dataset.forceheure = HCombo.value;
-				item.dataset.forceminute = MCombo.value;  
-			}
-		});
 
-		// Affiche les nouveaux états radiateurs dur le plan
-		MainState.textContent = ModeCombo.value;
-		console.log(`État mis à jour : ${ModeCombo.value}`);
-		ChangeRadiateurColor();
-	})
-	
-	// En cas d'erreur, message
-	.catch((err) => {
-		console.error(err);
-		alert("Échec de la mise à jour de l'état.");
-	});
+		// Vérifie le retour de l'envoi
+		.then((res) => {
+			if (!res.ok) throw new Error("Erreur réseau");
+			return res.json().catch(() => ({}));
+		})
+
+		// // Met à jour les infos locales pour tous les radiateur du groupe
+		// .then((data) => {
+		// 	const items = document.querySelectorAll(".radiateur");
+		// 	items.forEach((item) => {
+		// 		if (item.dataset.groupe === itempointer.textContent) {
+		// 			item.dataset.forcemode = ModeCombo.value;
+		// 			item.dataset.forceheure = HCombo.value;
+		// 			item.dataset.forceminute = MCombo.value;
+		// 		}
+		// 	});
+
+		// 	// Affiche les nouveaux états radiateurs dur le plan
+		// 	MainState.textContent = ModeCombo.value;
+		// 	console.log(`État mis à jour : ${ModeCombo.value}`);
+		// 	ChangeRadiateurColor();
+		// })
+
+		// En cas d'erreur, message
+		.catch((err) => {
+			console.error(err);
+			alert("Échec de la mise à jour de l'état.");
+		});
 }
 
 // Evènement
@@ -364,24 +400,23 @@ function EndModifyPiece() {
 // prise en compte des modifications uniquement si une durée est donnée
 // Données traitées en fonction du type de composant radiateur ou pièce
 Apply_modif_req.onclick = () => {
-	if(((HCombo.value != 0) || (MCombo.value != 0)) &&
-		(itempointer != null))
-	{
-		if( IsGroupe == false){
+	if (((HCombo.value != 0) || (MCombo.value != 0)) &&
+		(itempointer != null)) {
+		if (IsGroupe == false) {
 			//Terminer forçage radiateur
-			EndModifyRadiateur();
+			EndForceRadiateur();
 		}
-		else{
+		else {
 			// Terminrt forçage pièce
-			EndModifyPiece();   
+			EndForcePiece();
 		}
 
 	}
-	else{
+	else {
 		// Durée nulle, pas de forçage
 		console.log("Pas de forcage.");
 	}
-	
+
 	// Fermer la fenêtre
 	ModifModal.style.display = "none";
 };
@@ -392,32 +427,32 @@ Apply_modif_req.onclick = () => {
 
 // fonction
 // Dessine le graphe mode en fonction du temps pour un jour donné
-function LoadGraphModeTime( NumJour) {
+function LoadGraphModeTime(NumJour) {
 	//value -> nom du jour
 	let Jour = JoursSemaine[NumJour];
 	//trier suivant les heures croissantes
-	Schedule[ Jour].sort((a, b) => (((a.heure * 60) + a.minute) - ((b.heure * 60) + b.minute)));
+	Schedule[Jour].sort((a, b) => (((a.Heure * 60) + a.Minute) - ((b.Heure * 60) + b.Minute)));
 	// properties
 	let width = Canvas.width;
 	let height = Canvas.height;
 	console.log(`canvas, width= ${width}, height= ${height}`);
 	// Effacer le canvas
-	ctx.clearRect(0, 0, width, height); 
+	ctx.clearRect(0, 0, width, height);
 	//appliquer zoom et translation
 	ctx.save();
-	ctx.setTransform( scale, 0, 0, 1, originX, 0);
-	ctxPosMouse.clearRect(0, 0, width, height); 
+	ctx.setTransform(scale, 0, 0, 1, originX, 0);
+	ctxPosMouse.clearRect(0, 0, width, height);
 	// Dessiner l'axe horizontal'
 	let heightCanvasAbsc = CvsAbscisTitle.height;
-	CtxAbscisTitle.clearRect(0, 0, width, heightCanvasAbsc); 
+	CtxAbscisTitle.clearRect(0, 0, width, heightCanvasAbsc);
 	CtxAbscisTitle.beginPath();
 	CtxAbscisTitle.moveTo(0, heightCanvasAbsc - 50);
-	CtxAbscisTitle.lineTo(0 +((24 *12) *scale) +originX, heightCanvasAbsc - 50);
+	CtxAbscisTitle.lineTo(0 + ((24 * 12) * scale) + originX, heightCanvasAbsc - 50);
 	CtxAbscisTitle.strokeStyle = "black";
 	CtxAbscisTitle.stroke();
 	//dessiner les creneaux d'heure
 	for (let h = 0; h <= 24; h += 1) {
-		let x = 0 +((h *12) *scale) +originX;
+		let x = 0 + ((h * 12) * scale) + originX;
 		CtxAbscisTitle.beginPath();
 		CtxAbscisTitle.moveTo(x, heightCanvasAbsc - 52);
 		CtxAbscisTitle.lineTo(x, heightCanvasAbsc - 45);
@@ -433,7 +468,7 @@ function LoadGraphModeTime( NumJour) {
 		let y = heightCanvasOrdon - 60 - (m * 50);
 		CtxOrdonTitle.fillStyle = "black";
 		CtxOrdonTitle.font = "10px Arial";
-		CtxOrdonTitle.fillText(nom_state[m],2, y + 3);
+		CtxOrdonTitle.fillText(nom_state[m], 2, y + 3);
 	}
 	// Dessiner les points et les lignes
 	ctx.beginPath();
@@ -445,26 +480,26 @@ function LoadGraphModeTime( NumJour) {
 	let NextHeure = 24;
 	let NextMinute = 0;
 	//pour boucler, récupéter la dernière entrée du jour précédent
-	if( NumJour == 0){
-		//lundi, prendre le dimanche
-		if (Schedule[ JoursSemaine[6]].length > 0){
-			CurrentMode = Schedule[ JoursSemaine[6]][(Schedule[ JoursSemaine[6]].length) - 1].mode;
+	if (NumJour == 0) {
+		//dimanche, prendre le samedi
+		if (Schedule[JoursSemaine[6]].length > 0) {
+			CurrentMode = Schedule[JoursSemaine[6]][(Schedule[JoursSemaine[6]].length) - 1].Mode;
 		}
 	}
-	else{
+	else {
 		//autre jour, prendre le jour précédent
-		if (Schedule[ JoursSemaine[NumJour - 1]].length > 0){
-			CurrentMode = Schedule[ JoursSemaine[NumJour - 1]][(Schedule[ JoursSemaine[NumJour - 1]].length) - 1].mode;
+		if (Schedule[JoursSemaine[NumJour - 1]].length > 0) {
+			CurrentMode = Schedule[JoursSemaine[NumJour - 1]][(Schedule[JoursSemaine[NumJour - 1]].length) - 1].Mode;
 		}
 	}
-	for (let i = 0; i < Schedule[ Jour].length; i++) {
-		NextMode = Schedule[ Jour][ i].mode;
-		NextHeure = Schedule[ Jour][ i].heure;
-		NextMinute = Schedule[ Jour][ i].minute;
-		if( CurrentMode !== NextMode){
+	for (let i = 0; i < Schedule[Jour].length; i++) {
+		NextMode = Schedule[Jour][i].Mode;
+		NextHeure = Schedule[Jour][i].Heure;
+		NextMinute = Schedule[Jour][i].Minute;
+		if (CurrentMode !== NextMode) {
 			let x1 = 0 + (CurrentHeure * 12) + ((CurrentMinute / 5) * 1);
 			let x2 = 0 + (NextHeure * 12) + ((NextMinute / 5) * 1);
-			let y1 = height - 5 - (CurrentMode *50);
+			let y1 = height - 5 - (CurrentMode * 50);
 			let y2 = height - 5 - (NextMode * 50);
 			//ligne horizontale
 			ctx.moveTo(x1, y1);
@@ -478,14 +513,14 @@ function LoadGraphModeTime( NumJour) {
 		}
 	}
 	// ligne finale jusqu'à 24h
-	if( CurrentHeure < 24){
+	if (CurrentHeure < 24) {
 		let x1 = 0 + (CurrentHeure * 12) + ((CurrentMinute / 5) * 1);
 		let x2 = 0 + (24 * 12);
-		let y1 = height - 5 - (CurrentMode *50);
+		let y1 = height - 5 - (CurrentMode * 50);
 		ctx.moveTo(x1, y1);
 		ctx.lineTo(x2, y1);
 	}
-	ctx.stroke(); 
+	ctx.stroke();
 
 	//init
 	CurrentMode = 1;
@@ -498,28 +533,28 @@ function LoadGraphModeTime( NumJour) {
 	ZoneLabels.innerHTML = "";
 
 	//pour boucler, récupéter la dernière entrée du jour précédent
-	if( NumJour == 0){
-		//lundi, prendre le dimanche
-		if (Schedule[ JoursSemaine[6]].length > 0){
-			CurrentMode = Schedule[ JoursSemaine[6]][(Schedule[ JoursSemaine[6]].length) - 1].mode;
+	if (NumJour == 0) {
+		//dimanche, prendre le samedi
+		if (Schedule[JoursSemaine[6]].length > 0) {
+			CurrentMode = Schedule[JoursSemaine[6]][(Schedule[JoursSemaine[6]].length) - 1].Mode;
 		}
 	}
-	else{
+	else {
 		//autre jour, prendre le jour précédent
-		if (Schedule[ JoursSemaine[NumJour - 1]].length > 0){
-			CurrentMode = Schedule[ JoursSemaine[NumJour - 1]][(Schedule[ JoursSemaine[NumJour - 1]].length) - 1].mode;
+		if (Schedule[JoursSemaine[NumJour - 1]].length > 0) {
+			CurrentMode = Schedule[JoursSemaine[NumJour - 1]][(Schedule[JoursSemaine[NumJour - 1]].length) - 1].Mode;
 		}
 	}
-	for (let i = 0; i < Schedule[ Jour].length; i++) {
-		NextMode = Schedule[ Jour][ i].mode;
-		NextHeure = Schedule[ Jour][ i].heure;
-		NextMinute = Schedule[ Jour][ i].minute;
+	for (let i = 0; i < Schedule[Jour].length; i++) {
+		NextMode = Schedule[Jour][i].Mode;
+		NextHeure = Schedule[Jour][i].Heure;
+		NextMinute = Schedule[Jour][i].Minute;
 		const label = document.createElement("label");
-		label.textContent = 
-		NextHeure.toString().padStart(2, '0') +"H" +NextMinute.toString().padStart(2, '0') +", " +
-		nom_state[NextMode];
-		if( CurrentMode === NextMode){
-			label.textContent = label.textContent +"; Inactif"
+		label.textContent =
+			NextHeure.toString().padStart(2, '0') + "H" + NextMinute.toString().padStart(2, '0') + ", " +
+			nom_state[NextMode];
+		if (CurrentMode === NextMode) {
+			label.textContent = label.textContent + "; Inactif"
 		}
 		ZoneLabels.appendChild(label);
 		ZoneLabels.appendChild(document.createElement("br"));
@@ -544,16 +579,16 @@ function StartConfigureModal() {
 		optionElement.textContent = opt;
 		JourCombo.appendChild(optionElement);
 	});
-	
+
 	// Définir la valeur initiale
 	JourCombo.value = 0; // Par défaut Lundi
 	CurJour = 0;
 	scale = 1;
 	originX = 0;
-	isDragging = false; 
-	
+	isDragging = false;
+
 	//Charger le graphe
-	LoadGraphModeTime( JourCombo.value );
+	LoadGraphModeTime(JourCombo.value);
 
 	// Ovrir la fenêtre
 	ConfigModal.style.display = "block";
@@ -577,16 +612,15 @@ Canvas.addEventListener("wheel", (e) => {
 	// zoom sur le point du curseur
 	const wheel = e.deltaY < 0 ? 1 : -1;
 	const zoom = Math.exp(wheel * zoomIntensity);
-	
+
 	//Calcul du rapport d'agrandissement
 	scale *= zoom;
-	if( scale < 1)
-	{
+	if (scale < 1) {
 		scale = 1;
 	}
-	
+
 	//recharger le graphe
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 });
 
 // Evènement
@@ -607,20 +641,18 @@ Canvas.addEventListener("mouseup", () => {
 
 // Evènement
 // ----- pan (clic + glisser) en cours -----
-Canvas.addEventListener("mousemove", function(event) {
+Canvas.addEventListener("mousemove", function (event) {
 	const rect = Canvas.getBoundingClientRect();
-	const x = (event.clientX - rect.left -originX) /scale;
+	const x = (event.clientX - rect.left - originX) / scale;
 	const y = event.clientY - rect.top;
 
 	// si mouvement en cours
 	if (isDragging) {
-		if((event.offsetX - startX) > 0)
-		{
+		if ((event.offsetX - startX) > 0) {
 			//bloquer l'origine a 0 si negatif
 			originX = 0;
 		}
-		else
-		{
+		else {
 			// Calcul de la nouvelle origine
 			originX = event.offsetX - startX;
 		}
@@ -630,67 +662,65 @@ Canvas.addEventListener("mousemove", function(event) {
 	ctxPosMouse.clearRect(0, 0, PosMouse.width, PosMouse.height);
 	ctxPosMouse.fillStyle = "black";
 	ctxPosMouse.font = "16px Arial";
-	if((Math.floor(x) >= 0) && 
+	if ((Math.floor(x) >= 0) &&
 		(Math.floor(x) <= 616) &&
-		(Math.floor(y) <= (Canvas.height - 0)) && 
+		(Math.floor(y) <= (Canvas.height - 0)) &&
 		(Math.floor(y) >= (Canvas.height - 175))
-		)
-	{
+	) {
 		//convertir l'abcisse en heure et minute
 		let curheure = Math.floor((x - 0) / 12);
-		let curminute = Math.floor(((x -0) % 12) / 1) * 5;
+		let curminute = Math.floor(((x - 0) % 12) / 1) * 5;
 		//convertir l'ordonnée en mode
 		let curmode = 0;
-		if((Math.floor(y) <= (Canvas.height - 25) && 
-			(Math.floor(y) > (Canvas.height - 75)))){
+		if ((Math.floor(y) <= (Canvas.height - 25) &&
+			(Math.floor(y) > (Canvas.height - 75)))) {
 			curmode = 1;
 		}
-		else if((Math.floor(y) <= (Canvas.height - 75) && 
-			(Math.floor(y) > (Canvas.height - 125)))){
+		else if ((Math.floor(y) <= (Canvas.height - 75) &&
+			(Math.floor(y) > (Canvas.height - 125)))) {
 			curmode = 2;
 		}
-		else if(Math.floor(y) <= (Canvas.height - 125)){
+		else if (Math.floor(y) <= (Canvas.height - 125)) {
 			curmode = 3;
 		}
 		ctxPosMouse.fillText(`heure: ${curheure.toString().padStart(2, '0')} : ${curminute.toString().padStart(2, '0')} - mode: ${nom_state[curmode]}`, 10, 20);
 		ctxPosMouse.fillText(`posx: ${event.offsetX.toString()} ,x: ${x.toString()} ,y: ${y.toString()}`, 10, 40);
 		ctxPosMouse.fillText(`origine: ${originX.toString()} ,scale: ${scale.toString()}`, 10, 60);
 	}
-	
+
 	//reconstruire le graphe si mouvement en cours
 	if (isDragging) {
-		LoadGraphModeTime( CurJour );
+		LoadGraphModeTime(CurJour);
 	}
 });
 
 // Evènement
 // ----- double click -----
-Canvas.addEventListener("dblclick", function(event) {
+Canvas.addEventListener("dblclick", function (event) {
 	const rect = Canvas.getBoundingClientRect();
-	const x = (event.clientX - rect.left -originX) /scale;
+	const x = (event.clientX - rect.left - originX) / scale;
 	const y = event.clientY - rect.top;
 
 	// Check if within valid area
-	if((Math.floor(x) >= 0) && 
+	if ((Math.floor(x) >= 0) &&
 		(Math.floor(x) <= 616) &&
-		(Math.floor(y) <= (Canvas.height - 0)) && 
+		(Math.floor(y) <= (Canvas.height - 0)) &&
 		(Math.floor(y) >= (Canvas.height - 175))
-		)
-	{
+	) {
 		//convertir l'abcisse en heure et minute
 		LockHeure = Math.floor((x - 0) / 12);
 		LockMinute = Math.floor(((x - 0) % 12) / 1) * 5;
 		//convertir l'ordonnée en mode
 		LockMode = 0;
-		if((Math.floor(y) <= (Canvas.height - 25) && 
-			(Math.floor(y) > (Canvas.height - 75)))){
+		if ((Math.floor(y) <= (Canvas.height - 25) &&
+			(Math.floor(y) > (Canvas.height - 75)))) {
 			LockMode = 1;
 		}
-		else if((Math.floor(y) <= (Canvas.height - 75) && 
-			(Math.floor(y) > (Canvas.height - 125)))){
+		else if ((Math.floor(y) <= (Canvas.height - 75) &&
+			(Math.floor(y) > (Canvas.height - 125)))) {
 			LockMode = 2;
 		}
-		else if(Math.floor(y) <= (Canvas.height - 125)){
+		else if (Math.floor(y) <= (Canvas.height - 125)) {
 			LockMode = 3;
 		}
 		console.log(`Lock heure: ${LockHeure.toString().padStart(2, '0')} : ${LockMinute.toString().padStart(2, '0')} - mode: ${nom_state[LockMode]}`);
@@ -702,17 +732,17 @@ Canvas.addEventListener("dblclick", function(event) {
 
 // Evènement
 // ----- nouvelle valeur dans la combo jour -----
-document.getElementById("jour-Combo").addEventListener("change", function(){
+document.getElementById("jour-Combo").addEventListener("change", function () {
 	//récupérer le nouveau jour
 	console.log(`Jour selectionné: ${JoursSemaine[this.value]}`);
 	CurJour = this.value;
 	// Valeur par défaut agrandissement, origine, mouvement en cours
 	scale = 1;
 	originX = 0;
-	isDragging = false; 
-	
+	isDragging = false;
+
 	//Graphe du jour sélectionné
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 });
 
 // fonction
@@ -727,29 +757,29 @@ function EndConfigRadiateur() {
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ 
+			body: JSON.stringify({
 				DayConfigs: Schedule
 			}),
 		}
 	)
-	
-	// Verifie que l'envoi est sans erreur
-	.then((res) => {
-		if (!res.ok) throw new Error("Erreur réseau");
-		return res.json().catch(() => ({}));
-	})
-	
-	// Met à jour les infos locales
-	.then((data) => {
-		itempointer.dataset.schedule = JSON.stringify(Schedule);
-		console.log(`Configuration par jour mise à jour`);
-	})
-	
-	// En cas d'envoi avec erreur
-	.catch((err) => {
-		console.error(err);
-		alert("Échec de la mise à jour de la configuration par jour");
-	});          
+
+		// Verifie que l'envoi est sans erreur
+		.then((res) => {
+			if (!res.ok) throw new Error("Erreur réseau");
+			return res.json().catch(() => ({}));
+		})
+
+		// Met à jour les infos locales
+		.then((data) => {
+			itempointer.dataset.schedule = JSON.stringify(Schedule);
+			console.log(`Configuration par jour mise à jour`);
+		})
+
+		// En cas d'envoi avec erreur
+		.catch((err) => {
+			console.error(err);
+			alert("Échec de la mise à jour de la configuration par jour");
+		});
 };
 
 // fonction
@@ -764,34 +794,34 @@ function EndConfigPiece() {
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ 
+			body: JSON.stringify({
 				DayConfigs: Schedule
 			}),
 		}
 	)
-	
-	// Verifie que l'envoi est sans erreur
-	.then((res) => {
-		if (!res.ok) throw new Error("Erreur réseau");
-		return res.json().catch(() => ({}));
-	})
-	
-	// Met à jour les infos locales
-	.then((data) => {
-		const items = document.querySelectorAll(".radiateur");
-		items.forEach((item) => {
-			if(item.dataset.groupe === itempointer.textContent){
-				item.dataset.schedule = JSON.stringify(Schedule);
-			}
+
+		// Verifie que l'envoi est sans erreur
+		.then((res) => {
+			if (!res.ok) throw new Error("Erreur réseau");
+			return res.json().catch(() => ({}));
+		})
+
+		// Met à jour les infos locales
+		.then((data) => {
+			const items = document.querySelectorAll(".radiateur");
+			items.forEach((item) => {
+				if (item.dataset.groupe === itempointer.textContent) {
+					item.dataset.schedule = JSON.stringify(Schedule);
+				}
+			});
+			console.log(`Configuration par jour mise à jour`);
+		})
+
+		// En cas d'envoi avec erreur
+		.catch((err) => {
+			console.error(err);
+			alert("Échec de la mise à jour de la configuration par jour");
 		});
-		console.log(`Configuration par jour mise à jour`);
-	})
-	
-	// En cas d'envoi avec erreur
-	.catch((err) => {
-		console.error(err);
-		alert("Échec de la mise à jour de la configuration par jour");
-	});          
 };
 
 // Evènement
@@ -799,15 +829,15 @@ function EndConfigPiece() {
 // Ferme la fenêtre avec prise en compte des informations
 // traite en fonction du type d'élément (raditeur ou piece)
 apply_config_req.onclick = () => {
-	if( IsGroupe == false){
+	if (IsGroupe == false) {
 		//Terminer forçage radiateur
 		EndConfigRadiateur();
 	}
-	else{
+	else {
 		// Terminrt forçage pièce
-		EndConfigPiece();   
+		EndConfigPiece();
 	}
-	
+
 	// Fermer la fenêtre
 	ConfigModal.style.display = "none";
 };
@@ -817,12 +847,12 @@ apply_config_req.onclick = () => {
 // Duplique la programmation du jour courant sur tous les autres jours
 Duplicate_config_req.onclick = () => {
 	let Jour = JoursSemaine[CurJour];
-	for( const key in Schedule) {
-		if( key !== Jour) {
-			Schedule[ key] = Schedule[ Jour];
+	for (const key in Schedule) {
+		if (key !== Jour) {
+			Schedule[key] = Schedule[Jour];
 		}
 	}
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 };
 
 // Evènement
@@ -852,7 +882,7 @@ function StartAddDelPointModal() {
 	// Remplir la combobox mode
 	AddDelModeCombo.innerHTML = "";
 	for (let i = 0; i <= 3; i++) {
-		const Item= document.createElement("option");
+		const Item = document.createElement("option");
 		Item.value = i;
 		Item.textContent = nom_state[i];
 		AddDelModeCombo.appendChild(Item);
@@ -861,16 +891,16 @@ function StartAddDelPointModal() {
 
 	// Remplir les combobox temps (heure et minutes)
 	AddDelHeureCombo.innerHTML = "";
-	if( LockHeure >= 1) {
-		LockHeure = LockHeure -1;
+	if (LockHeure >= 1) {
+		LockHeure = LockHeure - 1;
 	}
-	if( LockHeure == 22) {
-		LockHeure = LockHeure -1;
+	if (LockHeure == 22) {
+		LockHeure = LockHeure - 1;
 	}
-	for( let I = 0; I < 3; I++) {
+	for (let I = 0; I < 3; I++) {
 		const optionElement = document.createElement("option");
 		optionElement.value = I;
-		optionElement.textContent = (LockHeure +I).toString().padStart(2, '0');
+		optionElement.textContent = (LockHeure + I).toString().padStart(2, '0');
 		AddDelHeureCombo.appendChild(optionElement);
 	}
 	AddDelHeureCombo.value = 1;
@@ -888,17 +918,17 @@ function StartAddDelPointModal() {
 	AddDelPointCombo.innerHTML = "";
 	let nbPoints = 0;
 	LockCancelIndexPoint = -1;
-	for (let i = 0; i < Schedule[ Jour].length; i++) {
-		if((Schedule[Jour][i].heure >= LockHeure) &&
-		  (Schedule[Jour][i].heure <= LockHeure +2)) {
-			if( LockCancelIndexPoint == -1) {
+	for (let i = 0; i < Schedule[Jour].length; i++) {
+		if ((Schedule[Jour][i].Heure >= LockHeure) &&
+			(Schedule[Jour][i].Heure <= LockHeure + 2)) {
+			if (LockCancelIndexPoint == -1) {
 				LockCancelIndexPoint = i;
 			}
-			const Item= document.createElement("option");
+			const Item = document.createElement("option");
 			Item.value = nbPoints;
-			nbPoints ++;
-			Item.textContent = 
-			`${Schedule[Jour][i].heure.toString().padStart(2, '0')}H${Schedule[ Jour][i].minute.toString().padStart(2, '0')} - ${nom_state[Schedule[ Jour][i].mode]}`;
+			nbPoints++;
+			Item.textContent =
+				`${Schedule[Jour][i].Heure.toString().padStart(2, '0')}H${Schedule[Jour][i].Minute.toString().padStart(2, '0')} - ${nom_state[Schedule[Jour][i].Mode]}`;
 			AddDelPointCombo.appendChild(Item);
 		}
 	}
@@ -920,18 +950,18 @@ document.getElementById("closeModal_AddDelPoint").onclick = () => {
 // prend en compte la demande et détruit la fenêtre modale
 // reconstruit le graphe du jour
 DelPoint_AddDelconfig_req.onclick = () => {
-	if( LockCancelIndexPoint != -1) {
+	if (LockCancelIndexPoint != -1) {
 		//value -> nom du jour
 		let Jour = JoursSemaine[CurJour];
-		const indexToDelete = parseInt(AddDelPointCombo.value) +LockCancelIndexPoint;
-		if( isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= Schedule[ Jour].length){
+		const indexToDelete = parseInt(AddDelPointCombo.value) + LockCancelIndexPoint;
+		if (isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= Schedule[Jour].length) {
 			alert("Index invalide.");
 			return;
 		}
-		Schedule[ Jour].splice(indexToDelete, 1);
+		Schedule[Jour].splice(indexToDelete, 1);
 		alert(`Point ${indexToDelete} supprimé.`);
 		AddDelPointModal.style.display = "none";
-		LoadGraphModeTime( CurJour );
+		LoadGraphModeTime(CurJour);
 	}
 };
 
@@ -943,20 +973,20 @@ DelPoint_AddDelconfig_req.onclick = () => {
 AddPoint_AddDelconfig_req.onclick = () => {
 	//value -> nom du jour
 	let Jour = JoursSemaine[CurJour];
-	const newHeure = parseInt(AddDelHeureCombo.value) +LockHeure;
+	const newHeure = parseInt(AddDelHeureCombo.value) + LockHeure;
 	const newMinute = parseInt(AddDelMinuteCombo.value);
 	const newMode = parseInt(AddDelModeCombo.value);
 	//vérifier si le point existe déjà
-	const exists = Schedule[ Jour].some(point => point.heure === newHeure && point.minute === newMinute);
-	if( exists ){
+	const exists = Schedule[Jour].some(point => point.Heure === newHeure && point.Minute === newMinute);
+	if (exists) {
 		alert("Un point existe déjà à cette heure.");
 		return;
 	}
 	//ajouter le point
-	Schedule[ Jour].push({ heure: newHeure, minute: newMinute, mode: newMode });
+	Schedule[Jour].push({ Heure: newHeure, Minute: newMinute, Mode: newMode });
 	alert(`Point ajouté: ${newHeure.toString().padStart(2, '0')}H${newMinute.toString().padStart(2, '0')} - ${nom_state[newMode]}`);
 	AddDelPointModal.style.display = "none";
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 };
 
 
@@ -973,7 +1003,7 @@ function StartAddPointModal() {
 	// Remplir les combobox modes
 	AddModeCombo.innerHTML = "";
 	for (let i = 0; i <= 3; i++) {
-		const Item= document.createElement("option");
+		const Item = document.createElement("option");
 		Item.value = i;
 		Item.textContent = nom_state[i];
 		AddModeCombo.appendChild(Item);
@@ -1021,16 +1051,16 @@ AddPoint_config_req.onclick = () => {
 	const newMinute = parseInt(AddMinuteCombo.value);
 	const newMode = parseInt(AddModeCombo.value);
 	//vérifier si le point existe déjà
-	const exists = Schedule[ Jour].some(point => point.heure === newHeure && point.minute === newMinute);
-	if( exists ){
+	const exists = Schedule[Jour].some(point => point.Heure === newHeure && point.Minute === newMinute);
+	if (exists) {
 		alert("Un point existe déjà à cette heure.");
 		return;
 	}
 	//ajouter le point
-	Schedule[ Jour].push({ heure: newHeure, minute: newMinute, mode: newMode });
+	Schedule[Jour].push({ Heure: newHeure, Minute: newMinute, Mode: newMode });
 	alert(`Point ajouté: ${newHeure.toString().padStart(2, '0')}H${newMinute.toString().padStart(2, '0')} - ${nom_state[newMode]}`);
 	AddPointModal.style.display = "none";
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 };
 
 
@@ -1046,11 +1076,11 @@ function StartDelPointModal() {
 	DelPointJour.textContent = `Jour: ${Jour}`;
 	// Remplir la combobox points existants
 	DelPointCombo.innerHTML = "";
-	for (let i = 0; i < Schedule[ Jour].length; i++) {
-		const Item= document.createElement("option");
+	for (let i = 0; i < Schedule[Jour].length; i++) {
+		const Item = document.createElement("option");
 		Item.value = i;
-		Item.textContent = 
-		  `${Schedule[Jour][i].heure.toString().padStart(2, '0')}H${Schedule[ Jour][i].minute.toString().padStart(2, '0')} - ${nom_state[Schedule[ Jour][i].mode]}`;
+		Item.textContent =
+			`${Schedule[Jour][i].Heure.toString().padStart(2, '0')}H${Schedule[Jour][i].Minute.toString().padStart(2, '0')} - ${nom_state[Schedule[Jour][i].Mode]}`;
 		DelPointCombo.appendChild(Item);
 	}
 	DelPointCombo.value = 0; // Par défaut le premier
@@ -1072,14 +1102,14 @@ DelPoint_config_req.onclick = () => {
 	//value -> nom du jour
 	let Jour = JoursSemaine[CurJour];
 	const indexToDelete = parseInt(DelPointCombo.value);
-	if( isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= Schedule[ Jour].length){
+	if (isNaN(indexToDelete) || indexToDelete < 0 || indexToDelete >= Schedule[Jour].length) {
 		alert("Index invalide.");
 		return;
 	}
-	Schedule[ Jour].splice(indexToDelete, 1);
+	Schedule[Jour].splice(indexToDelete, 1);
 	alert(`Point ${indexToDelete} supprimé.`);
 	DelPointModal.style.display = "none";
-	LoadGraphModeTime( CurJour );
+	LoadGraphModeTime(CurJour);
 };
 
 // voir si nécessaire
