@@ -103,7 +103,7 @@ function updateData() {
 
 		.then(data => {
 			// 🔹 Mise à jour des radiateurs
-			data.Radiateurs.forEach(r => {
+			data.Heaters.forEach(r => {
 				let el = document.getElementById(r.Id);
 				if (el) {
 					el.setAttribute("data-state", r.Mode);
@@ -114,7 +114,7 @@ function updateData() {
 				}
 				console.log(`Radiateur ${r.Id} mis à jour : Mode=${r.Mode}, Groupe=${r.Groupe}, Force=${r.Force.Mode} ${r.Force.Heure}h${r.Force.Minute}`);
 			});
-			ChangeRadiateurColor();
+			ChangeHeaterColor();
 		})
 
 		.catch(err => console.error("JSON ERROR :", err));
@@ -125,13 +125,13 @@ setInterval(updateData, 10000); // toutes les 10 secondes
 
 // fonction
 // Modification de la couleur du rectangle en fonction de l'état du radiateur
-function ChangeRadiateurColor() {
-	console.log("Changing radiateur colors...");
+function ChangeHeaterColor() {
+	console.log("Changing heater colors...");
 	// Boucle sur les rectangles SVG
-	const items = document.querySelectorAll(".radiateur");
-	console.log(`Found ${items.length} radiateurs.`);
+	const items = document.querySelectorAll(".heater");
+	console.log(`Found ${items.length} heaters.`);
 	items.forEach((item) => {
-		console.log(`radiateur ${item.id}: etat: ${item.dataset.state}`);
+		console.log(`heater: ${item.id}: etat: ${item.dataset.state}`);
 		const couleur = couleurs[item.dataset.state] || "gray"; // défaut si valeur inconnue
 		item.dataset.nom_state = nom_state[item.dataset.state] || "Inconnu";
 		item.setAttribute("fill", couleur);
@@ -143,7 +143,7 @@ function ChangeRadiateurColor() {
 //	Ajouter l'evènement "Click"
 //		Récupérer les infos liées à ce radiateur
 //		lancer la modale Main
-document.querySelectorAll(".radiateur").forEach((el) => {
+document.querySelectorAll(".heater").forEach((el) => {
 	el.addEventListener("click", () => {
 		ElemNom = el.dataset.nom;
 		ElemEtat = el.dataset.nom_state;
@@ -169,12 +169,12 @@ document.querySelectorAll(".radiateur").forEach((el) => {
 //		Si la classe ne contient aucun radiateur, signaler par un popup
 //		Récupérer les infos liées au premier radiateur de cette classe
 //		lancer la modale Main
-document.querySelectorAll(".piece").forEach((el) => {
+document.querySelectorAll(".group").forEach((el) => {
 	el.addEventListener("click", () => {
-		console.log(`piece ${el.textContent}`);
-		const items = Array.from(document.querySelectorAll(".radiateur"));
+		console.log(`groupe: ${el.textContent}`);
+		const items = Array.from(document.querySelectorAll(".heater"));
 		if (items.some((item) => {
-			console.log(`radiateur ${item.id}: groupe: ${item.dataset.groupe}`);
+			console.log(`heater ${item.id}: groupe: ${item.dataset.groupe}`);
 			if (item.dataset.groupe === el.textContent.trim()) {
 				ElemEtat = item.dataset.nom_state;
 				forceheure = item.dataset.forceheure;
@@ -199,7 +199,7 @@ document.querySelectorAll(".piece").forEach((el) => {
 
 // A l'affichage du plan HTML		
 // Change la couleur des radiateurs en fonction de leur etat
-ChangeRadiateurColor();
+ChangeHeaterColor();
 
 
 // Fenêtre modale de choix d'action
@@ -302,10 +302,10 @@ document.getElementById("closeModal_Modif").onclick = () => {
 // Envoie les nouvelles informations au serveur
 // Verifie le reour de l'envoi
 // Met à jour les infos locales pour le radiateur sélectionné
-function EndForceRadiateur() {
+function EndForceHeater() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
-		`/radiateur/${encodeURIComponent(itempointer.id)}/set-NewRadiateurState`,
+		`/groundfloor/heater/${encodeURIComponent(itempointer.id)}/set-NewheaterState`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -345,14 +345,14 @@ function EndForceRadiateur() {
 }
 
 // fonction
-// fin forçage pièce
+// fin forçage groupe
 // Envoie les nouvelles informations au serveur
 // Verifie le reour de l'envoi
 // Met à jour les infos locales pour tous les radiateurs du groupe
-function EndForcePiece() {
+function EndForceGroup() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
-		`/piece/${encodeURIComponent(itempointer.id)}/set-NewGroupeState`,
+		`/groundfloor/group/${encodeURIComponent(itempointer.id)}/set-NewGroupState`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -404,11 +404,11 @@ Apply_modif_req.onclick = () => {
 		(itempointer != null)) {
 		if (IsGroupe == false) {
 			//Terminer forçage radiateur
-			EndForceRadiateur();
+			EndForceHeater();
 		}
 		else {
-			// Terminrt forçage pièce
-			EndForcePiece();
+			// Terminrt forçage groupe
+			EndForceGroup();
 		}
 
 	}
@@ -750,10 +750,10 @@ document.getElementById("jour-Combo").addEventListener("change", function () {
 // Contrôle si l'envoi au serveur s'est bien passé
 // met à jour la configuration locale
 // pop up en cas d'erreur
-function EndConfigRadiateur() {
+function EndConfigHeater() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
-		`/radiateur/${encodeURIComponent(itempointer.id)}/set-NewRadiateurConfig`,
+		`/groundfloor/heater/${encodeURIComponent(itempointer.id)}/set-NewHeaterConfig`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -787,10 +787,10 @@ function EndConfigRadiateur() {
 // Contrôle si l'envoi au serveur s'est bien passé
 // met à jour la configuration locale
 // pop up en cas d'erreur
-function EndConfigPiece() {
+function EndConfigGroup() {
 	// Envoie les nouvelles informations au serveur
 	fetch(
-		`/piece/${encodeURIComponent(itempointer.id)}/set-NewGroupeConfig`,
+		`/groundfloor/group/${encodeURIComponent(itempointer.id)}/set-NewGroupConfig`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -808,7 +808,7 @@ function EndConfigPiece() {
 
 		// Met à jour les infos locales
 		.then((data) => {
-			const items = document.querySelectorAll(".radiateur");
+			const items = document.querySelectorAll(".heater");
 			items.forEach((item) => {
 				if (item.dataset.groupe === itempointer.textContent) {
 					item.dataset.schedule = JSON.stringify(Schedule);
@@ -827,15 +827,15 @@ function EndConfigPiece() {
 // Evènement
 // Appui sur le bouton "Applique"
 // Ferme la fenêtre avec prise en compte des informations
-// traite en fonction du type d'élément (raditeur ou piece)
+// traite en fonction du type d'élément (heater or group)
 apply_config_req.onclick = () => {
 	if (IsGroupe == false) {
-		//Terminer forçage radiateur
-		EndConfigRadiateur();
+		//End force heater
+		EndConfigHeater();
 	}
 	else {
-		// Terminrt forçage pièce
-		EndConfigPiece();
+		// End force groupe
+		EndConfigGroup();
 	}
 
 	// Fermer la fenêtre

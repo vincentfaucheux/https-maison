@@ -1,0 +1,848 @@
+{
+    "Maison": {
+        "Etage_0": {
+            "Force": {
+                "Radiateur_1": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_2": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_3": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_4": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_5": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_6": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                }
+            },
+            "Mode": {
+                "Radiateur_1": 1,
+                "Radiateur_2": 1,
+                "Radiateur_3": 1,
+                "Radiateur_4": 1,
+                "Radiateur_5": 1,
+                "Radiateur_6": 1
+            },
+            "Schedule": {
+                "Radiateur_1": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_2": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_3": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_4": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_5": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_6": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                }
+            }
+        },
+        "Etage_1": {
+            "Force": {
+                "Radiateur_10": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 2
+                },
+                "Radiateur_11": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 1
+                },
+                "Radiateur_12": {
+                    "Heure": 0,
+                    "Minute": 0,
+                    "Mode": 1
+                }
+            },
+            "Mode": {
+                "Radiateur_10": 1,
+                "Radiateur_11": 1,
+                "Radiateur_12": 1
+            },
+            "Schedule": {
+                "Radiateur_10": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_11": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                },
+                "Radiateur_12": {
+                    "Dimanche": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Jeudi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Lundi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mardi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Mercredi": [
+                        {
+                            "Heure": 5,
+                            "Mode": 1,
+                            "minute": 0
+                        },
+                        {
+                            "Heure": 23,
+                            "Mode": 2,
+                            "minute": 0
+                        }
+                    ],
+                    "Samedi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ],
+                    "Vendredi": [
+                        {
+                            "Heure": 5,
+                            "Minute": 0,
+                            "Mode": 1
+                        },
+                        {
+                            "Heure": 23,
+                            "Minute": 0,
+                            "Mode": 2
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

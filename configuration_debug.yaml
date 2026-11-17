@@ -1,0 +1,6 @@
+interprocess_pipes_lib: "/home/vincent-pi4/zigbee/build/debug/interProcess/PipeComApp/PipeComSo/libPipeComSo.so"
+interprocess_client_lib: "/home/vincent-pi4/zigbee/build/debug/python"
+interprocess_server_lib: "/home/vincent-pi4/build/debug/python"
+app2serv_pipe_name: "/home/vincent-pi4/zigbee/interProcess/Pipes/Client2Serv"
+serv2app_pipe_name: "/home/vincent-pi4/zigbee/interProcess/Pipes/Serv2Client"
+log_path: /home/vincent-pi4/zigbee/build/debug/bin/log

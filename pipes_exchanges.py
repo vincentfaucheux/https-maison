@@ -1,8 +1,5 @@
-from pathlib import Path
 import sys
 import time
-import threading
-import yaml
 import struct
 
 
@@ -31,7 +28,7 @@ def on_data():
 #
 #pipes initialization
 #
-def init_pipes():
+def init_pipes( config):
     global ep
     global bWriteCreated
     global bDataReceived
@@ -44,17 +41,6 @@ def init_pipes():
     reply_length = 0
 
     print("Initialisation des tubes d'échange...")
-    #
-    # Charger le fichier de configuration
-    config_path = Path(__file__).resolve().parent / "configuration.yaml"
-    if( config_path.exists() == False ):
-        print("Fichier de configuration introuvable")
-        sys.exit( -1 )
-
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-
-    print(config)
 
     #
     #charger la librairie interprocess

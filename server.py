@@ -3,12 +3,16 @@ from flask import jsonify
 from typing import Any
 from data2json import write_json2file, read_string2fulljson, read_string2partialjson, write_json2string
 from pipes_exchanges import init_pipes, end_pipes, send_request_on_pipe
+from pathlib import Path
+import yaml
+import sys
 import threading
 import time
+import mylog
 
 app = Flask(__name__)
 
-RADIATEUR_CONFIGS = {
+HEATER_CONFIGS = {
     "Maison": {
         "Etage_0": {
             "Radiateur_1": { 
@@ -52,14 +56,6 @@ RADIATEUR_CONFIGS = {
                 "Height": "30"
             },
             "Radiateur_6": { 
-                "Nom": "Radiateur Salle de bain", 
-                "Groupe": "Salle de bain",
-                "X": "540", 
-                "Y": "325", 
-                "Width": "10", 
-                "Height": "30"
-            },
-            "Radiateur_7": { 
                 "Nom": "Radiateur Chambre", 
                 "Groupe": "Chambre",
                 "X": "500", 
@@ -67,11 +63,37 @@ RADIATEUR_CONFIGS = {
                 "Width": "30", 
                 "Height": "10"
             },
+        },
+        "Etage_1": {
+            "Radiateur_10": { 
+                "Nom": "Radiateur Martin", 
+                "Groupe": "Chambres étage", 
+                "X": "400", 
+                "Y": "50", 
+                "Width": "30", 
+                "Height": "10"
+            },
+            "Radiateur_11": { 
+                "Nom": "Radiateur Justin", 
+                "Groupe": "Chambres étage",
+                "X": "400", 
+                "Y": "540", 
+                "Width": "30", 
+                "Height": "10"
+            },
+            "Radiateur_12": { 
+                "Nom": "Radiateur Charlie", 
+                "Groupe": "Chambres étage",
+                "X": "150", 
+                "Y": "540", 
+                "Width": "30", 
+                "Height": "10"
+            }
         }
     }
 }
 
-PIECE_CONFIGS = {
+GROUP_CONFIGS = {
     "Maison": {
         "Etage_0": {
             "Piece_1": {  
@@ -88,18 +110,20 @@ PIECE_CONFIGS = {
                 "X":"430",
                 "Y":"200",
                 "Nom": "Chambre"
-            },
-            "Piece_4":  {
-                "X":"430",
-                "Y":"335",
-                "Nom": "Salle de bain"
+            }
+        },
+        "Etage_1": {
+            "Piece_10": {  
+                "X":"280",
+                "Y":"350",
+                "Nom": "Chambres étage"
             }
         }
     }
 }
 
 
-RADIATEURS_DATA_INIT = {
+HEATERS_DATA_INIT = {
     "Maison": {
         "Etage_0": {
             "Mode": {
@@ -109,7 +133,6 @@ RADIATEURS_DATA_INIT = {
                 "Radiateur_4": 1,
                 "Radiateur_5": 1,
                 "Radiateur_6": 1,
-                "Radiateur_7": 1,
             },
             "Force": {
                 "Radiateur_1": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
@@ -118,154 +141,146 @@ RADIATEURS_DATA_INIT = {
                 "Radiateur_4": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
                 "Radiateur_5": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
                 "Radiateur_6": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
-                "Radiateur_7": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
             },
             "Schedule": {
                 "Radiateur_1": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
                 "Radiateur_2": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
                 "Radiateur_3": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
                 "Radiateur_4": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
                 "Radiateur_5": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
                 "Radiateur_6": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
-                "Radiateur_7": {
-                    "Lundi": [
-                    ],
-                    "Mardi": [
-                    ],
-                    "Mercredi": [
-                    ],
-                    "Jeudi": [
-                    ],  
-                    "Vendredi": [
-                    ],
-                    "Samedi": [
-                    ],
-                    "Dimanche": [
-                    ]   
+            }
+        },
+        "Etage_1": {
+            "Mode": {
+                "Radiateur_10": 1,  # 0=RADIATEUR_STATESoff, 1=conf, 2=eco, 3=hors gel
+                "Radiateur_11": 1,
+                "Radiateur_12": 1
+            },
+            "Force": {
+                "Radiateur_10": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_11": { "Heure": 0, "Minute": 0, "Mode": 1 }, 
+                "Radiateur_12": { "Heure": 0, "Minute": 0, "Mode": 1 } 
+            },
+            "Schedule": {
+                "Radiateur_10": {
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
                 },
+                "Radiateur_11": {
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
+                },
+                "Radiateur_12": {
+                    "Lundi": [],
+                    "Mardi": [],
+                    "Mercredi": [],
+                    "Jeudi": [],  
+                    "Vendredi": [],
+                    "Samedi": [],
+                    "Dimanche": []   
+                }
             }
         }
     }
 }
 
-RADIATEURS_DATA = {
+HEATERS_DATA = {
 }
 
-html_list_groundfloor = { "Radiateurs": [], "Pieces": [] }
+html_list_groundfloor = { "Heaters": [], "Groups": [] }
+html_list_firstfloor = { "Heaters": [], "Groups": [] }
 
 lock = threading.Lock()
 end_pipes_exchanges = False
 serv2main_dictionary = {}
 serv2main_msg = ""
 serv2main_trigger = False
+config = None
 
-def init_html_list_groundfloor_pieces():
+def init_html_list_groundfloor_groups():
     global html_list_groundfloor
-    html_list_groundfloor = { "Radiateurs": [], "Pieces": [] }
-    for id, piece_data in PIECE_CONFIGS["Maison"]["Etage_0"].items():
+    html_list_groundfloor = { "Heaters": [], "Groups": [] }
+    for id, piece_data in GROUP_CONFIGS["Maison"]["Etage_0"].items():
         piece_data = piece_data.copy()
         piece_data['Id'] = id
-        html_list_groundfloor["Pieces"].append(piece_data)
+        html_list_groundfloor["Groups"].append(piece_data)
+
+def init_html_list_firstfloor_groups():
+    global html_list_firstfloor
+    html_list_firstfloor = { "Heaters": [], "Groups": [] }
+    for id, piece_data in GROUP_CONFIGS["Maison"]["Etage_1"].items():
+        piece_data = piece_data.copy()
+        piece_data['Id'] = id
+        html_list_firstfloor["Groups"].append(piece_data)
 
 def update_main_app( floor, action, heaters):
     global serv2main_dictionary
-    global RADIATEURS_DATA
+    global HEATERS_DATA
     global serv2main_trigger
     global lock
     global serv2main_msg
     values = {}
     for heater in heaters: 
-        values[heater] = RADIATEURS_DATA["Maison"][floor][action][heater]
+        values[heater] = HEATERS_DATA["Maison"][floor][action][heater]
     path = [ "Maison", floor, action ]
     for key in reversed(path):
         values = { key: values }
@@ -278,37 +293,52 @@ def update_main_app( floor, action, heaters):
         serv2main_msg = msg
         serv2main_trigger = True
 
-def updage_groundfloor_radiateurs():
-    global RADIATEURS_DATA
+def updage_groundfloor_heaters():
+    global HEATERS_DATA
     global html_list_groundfloor
-    html_list_groundfloor ["Radiateurs"].clear()
+    html_list_groundfloor ["Heaters"].clear()
     # build the list for HTML
-    for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
+    for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_0"].items():
         radiateur_data = radiateur_data.copy()
         radiateur_data['Id'] = id
-        radiateur_data['Mode'] = RADIATEURS_DATA["Maison"]["Etage_0"]['Mode'][id]
-        radiateur_data['Force'] = RADIATEURS_DATA["Maison"]["Etage_0"]['Force'][id]
+        radiateur_data['Mode'] = HEATERS_DATA["Maison"]["Etage_0"]['Mode'][id]
+        radiateur_data['Force'] = HEATERS_DATA["Maison"]["Etage_0"]['Force'][id]
         # Example schedule
-        radiateur_data['Schedule'] = RADIATEURS_DATA["Maison"]["Etage_0"]['Schedule'][id]
-        html_list_groundfloor["Radiateurs"].append(radiateur_data)
+        radiateur_data['Schedule'] = HEATERS_DATA["Maison"]["Etage_0"]['Schedule'][id]
+        html_list_groundfloor["Heaters"].append(radiateur_data)
+
+def update_firstfloor_heaters():
+    global HEATERS_DATA
+    global html_list_firstfloor
+    html_list_firstfloor ["Heaters"].clear()
+    # build the list for HTML
+    for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_1"].items():
+        radiateur_data = radiateur_data.copy()
+        radiateur_data['Id'] = id
+        radiateur_data['Mode'] = HEATERS_DATA["Maison"]["Etage_1"]['Mode'][id]
+        radiateur_data['Force'] = HEATERS_DATA["Maison"]["Etage_1"]['Force'][id]
+        # Example schedule
+        radiateur_data['Schedule'] = HEATERS_DATA["Maison"]["Etage_1"]['Schedule'][id]
+        html_list_firstfloor["Heaters"].append(radiateur_data)
 
 def pipe_exchanges():
-    global RADIATEURS_DATA
+    global HEATERS_DATA
     global serv2main_msg
     global serv2main_trigger
     global lock
-    # échange initial, etats, force et schedule, pour tous les radiateurs
+    # échange initial, etats, force et schedule, pour tous les heaters
     with lock:
         respons =send_request_on_pipe( 1, 255, 255, "")
     print("response ", respons)
-    retcode, serv2main_msg = read_string2fulljson(respons, RADIATEURS_DATA)
+    retcode, serv2main_msg = read_string2fulljson(respons, HEATERS_DATA)
     if retcode != 0:
         print( serv2main_msg)
         #print("JSON invalide, reinitialisation des donnees")
-        #RADIATEURS_DATA = RADIATEURS_DATA_INIT.copy()
-    print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
-    print("keys RADIATEURS_DATA['Maison'] ", RADIATEURS_DATA["Maison"].keys())
-    updage_groundfloor_radiateurs()
+        #HEATERS_DATA = HEATERS_DATA_INIT.copy()
+    print("keys HEATERS_DATA ", HEATERS_DATA.keys())
+    print("keys HEATERS_DATA['Maison'] ", HEATERS_DATA["Maison"].keys())
+    updage_groundfloor_heaters()
+    update_firstfloor_heaters()
 
     time.sleep( 1)
 
@@ -318,62 +348,75 @@ def pipe_exchanges():
             respons = send_request_on_pipe( 2, 255, 255, serv2main_msg)
             print("response ", respons)
         else:
-            # échanges périodiques, etats et force, pour tous les radiateurs
+            # échanges périodiques, etats et force, pour tous les heaters
             with lock:
                 respons =send_request_on_pipe( 1, 255, 3, "")
             print("response ", respons)
-            retcode, msg = read_string2partialjson(respons, RADIATEURS_DATA)
+            retcode, msg = read_string2partialjson(respons, HEATERS_DATA)
             if retcode != 0:
                 print( msg)
-            print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
-            print("keys RADIATEURS_DATA['Maison'] ", RADIATEURS_DATA["Maison"].keys())
-            updage_groundfloor_radiateurs()
+            print("keys HEATERS_DATA ", HEATERS_DATA.keys())
+            print("keys HEATERS_DATA['Maison'] ", HEATERS_DATA["Maison"].keys())
+            updage_groundfloor_heaters()
+            update_firstfloor_heaters()
 
         time.sleep( 20)
 
 @app.route('/')
 def accueil():
-    global RADIATEURS_DATA
+    global HEATERS_DATA
     # read the data from file
-    # retcode, msg = read_file2json(RADIATEURS_DATA)
+    # retcode, msg = read_file2json(HEATERS_DATA)
     #if retcode != 0:
     #    if retcode == -2:
     #        print("JSON invalide, reinitialisation des donnees")
-    #    RADIATEURS_DATA = RADIATEURS_DATA_INIT.copy()
-    print("keys RADIATEURS_DATA ", RADIATEURS_DATA.keys())
-    print("keys RADIATEURS_DATA['Maison'] ", RADIATEURS_DATA["Maison"].keys())
+    #    HEATERS_DATA = HEATERS_DATA_INIT.copy()
+    # print("keys HEATERS_DATA ", HEATERS_DATA.keys())
+    # print("keys HEATERS_DATA['Maison'] ", HEATERS_DATA["Maison"].keys())
 
     return render_template('index.html')
 
 
-@app.route('/rezdechausse')
-def rezdechausse():
-#    global RADIATEURS_DATA
+@app.route('/groundfloor')
+def groundfloor():
+#    global HEATERS_DATA
     global html_list_groundfloor
     # # build the list for HTML
-    # for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
+    # for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_0"].items():
     #     radiateur_data = radiateur_data.copy()
     #     radiateur_data['Id'] = id
-    #     radiateur_data['Mode'] = RADIATEURS_DATA['Mode'][id]
-    #     radiateur_data['Force'] = RADIATEURS_DATA['Force'][id]
+    #     radiateur_data['Mode'] = HEATERS_DATA['Mode'][id]
+    #     radiateur_data['Force'] = HEATERS_DATA['Force'][id]
     #     # Example schedule
-    #     radiateur_data['Schedule'] = RADIATEURS_DATA['Schedule'][id]
-    #     html_list_groundfloor["Radiateurs"].append(radiateur_data)
+    #     radiateur_data['Schedule'] = HEATERS_DATA['Schedule'][id]
+    #     html_list_groundfloor["Heaters"].append(radiateur_data)
 
-    # for id, piece_data in PIECE_CONFIGS["Maison"]["Etage_0"].items():
+    # for id, piece_data in GROUP_CONFIGS["Maison"]["Etage_0"].items():
     #     piece_data = piece_data.copy()
     #     piece_data['Id'] = id
-    #     html_list_groundfloor["Pieces"].append(piece_data)
+    #     html_list_groundfloor["Groups"].append(piece_data)
 
-    return render_template('RezDeChausse.html', radiateurs=html_list_groundfloor["Radiateurs"], pieces=html_list_groundfloor["Pieces"])
+    return render_template('GroundFloor.html', heaters=html_list_groundfloor["Heaters"], groups=html_list_groundfloor["Groups"])
+
+
+@app.route('/firstfloor')
+def firstfloor():
+    return render_template('FirstFloor.html', heaters=html_list_firstfloor["Heaters"], groups=html_list_firstfloor["Groups"])
+
 
 @app.route('/refresh_groundfloor_data')
-def data():
+def refresh_groundfloor_data():
     return jsonify(html_list_groundfloor)
 
-@app.route('/radiateur/<radiateur_id>/set-NewRadiateurState', methods=["POST"])
-def set_new_radiateurstate(radiateur_id: str):
-    global RADIATEURS_DATA
+
+@app.route('/refresh_firstfloor_data')
+def refresh_firstfloor_data():
+    return jsonify(html_list_firstfloor)
+
+
+@app.route('/groundfloor/heater/<heater_id>/set-NewheaterState', methods=["POST"])
+def set_new_groundfloor_heaterstate(heater_id: str):
+    global HEATERS_DATA
     # get the parameter
     force_mode = request.json.get("forcemode")
     force_heure = request.json.get("forceheure")
@@ -382,28 +425,31 @@ def set_new_radiateurstate(radiateur_id: str):
     #initiate list of heaters to update in main app
     heaters = []
 
-    # save the new state to the RadiateurState list
-    RADIATEURS_DATA["Maison"]["Etage_0"]["Force"][radiateur_id] = { 
+    # save the new state to the HeaterState list
+    HEATERS_DATA["Maison"]["Etage_0"]["Force"][heater_id] = { 
         "Heure": force_heure,
         "Minute": force_minute,
         "Mode": force_mode
     }
 
     #add the heater to the list of heaters to update in main app
-    heaters.append(radiateur_id)
+    heaters.append(heater_id)
 
     #request send to main app
     update_main_app( "Etage_0", "Force", heaters)
 
     # write to file
-    write_json2file(RADIATEURS_DATA)
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("heater: " + heater_id + " state set")
 
     return {"status": "success", "mode": force_mode}, 200
 
 
-@app.route('/piece/<piece_id>/set-NewGroupeState', methods=["POST"])
-def set_new_piece_state(piece_id: str):
-    global RADIATEURS_DATA
+@app.route('/firstfloor/heater/<heater_id>/set-NewheaterState', methods=["POST"])
+def set_new_heaterstate(heater_id: str):
+    global HEATERS_DATA
     # get the parameter
     force_mode = request.json.get("forcemode")
     force_heure = request.json.get("forceheure")
@@ -412,11 +458,44 @@ def set_new_piece_state(piece_id: str):
     #initiate list of heaters to update in main app
     heaters = []
 
-    # update all radiateurs in the piece
-    NomPiece = PIECE_CONFIGS["Maison"]["Etage_0"][piece_id]["Nom"]
-    for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
-        if radiateur_data["Groupe"] == NomPiece:
-            RADIATEURS_DATA["Maison"]["Etage_0"]["Force"][id] = { 
+    # save the new state to the HeaterState list
+    HEATERS_DATA["Maison"]["Etage_1"]["Force"][heater_id] = { 
+        "Heure": force_heure,
+        "Minute": force_minute,
+        "Mode": force_mode
+    }
+
+    #add the heater to the list of heaters to update in main app
+    heaters.append(heater_id)
+
+    #request send to main app
+    update_main_app( "Etage_1", "Force", heaters)
+
+    # write to file
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("heater: " + heater_id + " state set")
+
+    return {"status": "success", "mode": force_mode}, 200
+
+
+@app.route('/groundfloor/group/<group_id>/set-NewGroupState', methods=["POST"])
+def set_new_groundfloor_group_state(group_id: str):
+    global HEATERS_DATA
+    # get the parameter
+    force_mode = request.json.get("forcemode")
+    force_heure = request.json.get("forceheure")
+    force_minute = request.json.get("forceminute")
+
+    #initiate list of heaters to update in main app
+    heaters = []
+
+    # update all heaters in the piece
+    GroupName = GROUP_CONFIGS["Maison"]["Etage_0"][group_id]["Nom"]
+    for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_0"].items():
+        if radiateur_data["Groupe"] == GroupName:
+            HEATERS_DATA["Maison"]["Etage_0"]["Force"][id] = { 
                 "Heure": force_heure,
                 "Minute": force_minute,
                 "Mode": force_mode
@@ -429,49 +508,118 @@ def set_new_piece_state(piece_id: str):
     update_main_app( "Etage_0", "Force", heaters)
 
     # write to file
-    write_json2file(RADIATEURS_DATA)
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("group: " + GroupName + " state set")
 
     return {"status": "success", "mode": force_mode}, 200
 
 
-@app.route('/radiateur/<radiateur_id>/set-NewRadiateurConfig', methods=["POST"])
-def set_new_radiateurconfig(radiateur_id: str):
-    global RADIATEURS_DATA
+@app.route('/firstfloor/group/<group_id>/set-NewGroupState', methods=["POST"])
+def set_new_firstfloor_group_state(group_id: str):
+    global HEATERS_DATA
+    # get the parameter
+    force_mode = request.json.get("forcemode")
+    force_heure = request.json.get("forceheure")
+    force_minute = request.json.get("forceminute")
+
+    #initiate list of heaters to update in main app
+    heaters = []
+
+    # update all heaters in the piece
+    GroupName = GROUP_CONFIGS["Maison"]["Etage_1"][group_id]["Nom"]
+    for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_1"].items():
+        if radiateur_data["Groupe"] == GroupName:
+            HEATERS_DATA["Maison"]["Etage_1"]["Force"][id] = { 
+                "Heure": force_heure,
+                "Minute": force_minute,
+                "Mode": force_mode
+            }
+
+            #add the heater to the list of heaters to update in main app
+            heaters.append(id)
+
+    #request send to main app
+    update_main_app( "Etage_1", "Force", heaters)
+
+    # write to file
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("group: " + GroupName + " state set")
+
+    return {"status": "success", "mode": force_mode}, 200
+
+
+@app.route('/groundfloor/heater/<heater_id>/set-NewHeaterConfig', methods=["POST"])
+def set_new_groundfloor_heater_config(heater_id: str):
+    global HEATERS_DATA
     # get the parameter
     RadSchedule = request.json.get("DayConfigs")
 
     #initiate list of heaters to update in main app
     heaters = []
 
-    # save the new state to the RadiateurState list
-    RADIATEURS_DATA["Maison"]["Etage_0"]["Schedule"][radiateur_id] = RadSchedule
+    # save the new state to the HeaterState list
+    HEATERS_DATA["Maison"]["Etage_0"]["Schedule"][heater_id] = RadSchedule
 
     #add the heater to the list of heaters to update in main app
-    heaters.append(radiateur_id)
+    heaters.append(heater_id)
 
     #request send to main app
     update_main_app( "Etage_0", "Schedule", heaters)
 
     # write to file
-    write_json2file(RADIATEURS_DATA)
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("heater: " + heater_id + " config set")
 
     return {"status": "success", "state": "1"}, 200
 
 
-@app.route('/piece/<piece_id>/set-NewGroupeConfig', methods=["POST"])
-def set_new_piececonfig(piece_id: str):
-    global RADIATEURS_DATA
+@app.route('/firstfloor/heater/<heater_id>/set-NewHeaterConfig', methods=["POST"])
+def set_new_firstfloor_heater_config(heater_id: str):
+    global HEATERS_DATA
     # get the parameter
-    PieceSchedule = request.json.get("DayConfigs")
+    RadSchedule = request.json.get("DayConfigs")
 
     #initiate list of heaters to update in main app
     heaters = []
 
-    # update all radiateurs in the piece
-    NomPiece = PIECE_CONFIGS["Maison"]["Etage_0"][piece_id]["Nom"]
-    for id, radiateur_data in RADIATEUR_CONFIGS["Maison"]["Etage_0"].items():
-        if radiateur_data["Groupe"] == NomPiece:
-            RADIATEURS_DATA["Maison"]["Etage_0"]["Schedule"][id] = PieceSchedule
+    # save the new state to the HeaterState list
+    HEATERS_DATA["Maison"]["Etage_1"]["Schedule"][heater_id] = RadSchedule
+
+    #add the heater to the list of heaters to update in main app
+    heaters.append(heater_id)
+
+    #request send to main app
+    update_main_app( "Etage_1", "Schedule", heaters)
+
+    # write to file
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("heater: " + heater_id + " config set")
+
+    return {"status": "success", "state": "1"}, 200
+
+
+@app.route('/groundfloor/group/<group_id>/set-NewGroupConfig', methods=["POST"])
+def set_new_groundfloor_group_config(group_id: str):
+    global HEATERS_DATA
+    # get the parameter
+    GroupSchedule = request.json.get("DayConfigs")
+
+    #initiate list of heaters to update in main app
+    heaters = []
+
+    # update all heaters in the group
+    GroupName = GROUP_CONFIGS["Maison"]["Etage_0"][group_id]["Nom"]
+    for id, heater_data in HEATER_CONFIGS["Maison"]["Etage_0"].items():
+        if heater_data["Groupe"] == GroupName:
+            HEATERS_DATA["Maison"]["Etage_0"]["Schedule"][id] = GroupSchedule
 
             #add the heater to the list of heaters to update in main app
             heaters.append(id)
@@ -480,20 +628,74 @@ def set_new_piececonfig(piece_id: str):
     update_main_app( "Etage_0", "Schedule", heaters)
 
     # write to file
-    write_json2file(RADIATEURS_DATA)
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("group: " + GroupName + " config set")
+
+    return {"status": "success", "state": "1"}, 200
+
+
+@app.route('/firstfloor/group/<group_id>/set-NewGroupConfig', methods=["POST"])
+def set_new_firstfloor_group_config(group_id: str):
+    global HEATERS_DATA
+    # get the parameter
+    GroupSchedule = request.json.get("DayConfigs")
+
+    #initiate list of heaters to update in main app
+    heaters = []
+
+    # update all heaters in the group
+    GroupName = GROUP_CONFIGS["Maison"]["Etage_1"][group_id]["Nom"]
+    for id, radiateur_data in HEATER_CONFIGS["Maison"]["Etage_1"].items():
+        if radiateur_data["Groupe"] == GroupName:
+            HEATERS_DATA["Maison"]["Etage_1"]["Schedule"][id] = GroupSchedule
+
+            #add the heater to the list of heaters to update in main app
+            heaters.append(id)
+
+    #request send to main app
+    update_main_app( "Etage_1", "Schedule", heaters)
+
+    # write to file
+    write_json2file(HEATERS_DATA)
+
+    #logger info
+    mylog.info_log("group: " + GroupName + " config set")
 
     return {"status": "success", "state": "1"}, 200
 
 
 if __name__ == '__main__':
+    #
+    # Charger le fichier de configuration
+    print("Load configuration...")
+    config_path = Path(__file__).resolve().parent / "configuration.yaml"
+    if( config_path.exists() == False ):
+        print("Fichier de configuration introuvable")
+        sys.exit( -1 )
+
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    print(config)
+
+    # Initialiser le logging
+    if "log_path" not in config:
+        print("Clé log_path introuvable dans le fichier de configuration")
+        sys.exit( -1 )
+    mylog.start_log( config["log_path"])
+    mylog.info_log("Serveur started")
+
     # initialisation des tubes d'échange
-    init_pipes()
+    init_pipes( config)
     time.sleep( 2)
 
     #
     # initialisation de la liste pour HTML
     #
-    init_html_list_groundfloor_pieces()
+    init_html_list_groundfloor_groups()
+    init_html_list_firstfloor_groups()
 
     # start the thread for pipe exchanges
     t = threading.Thread(target=pipe_exchanges)
@@ -523,13 +725,7 @@ if __name__ == '__main__':
     t.join()
     end_pipes()
 
+    # Fermer le logging
+    mylog.info_log("Serveur stopped")
+    mylog.close_log()
 
-# en java script pour dedemander les nouvelles données
-#-------------------------------------------------------
-#setInterval(() => {
-#    fetch("/data")
-#        .then(r => r.json())
-#        .then(data => {
-#            document.body.innerText = JSON.stringify(data);
-#        });
-#}, 2000);

@@ -1,13 +1,16 @@
 header {
 	display: flex;
-	flex-direction: column; /* Aligne verticalement */
-	align-items: left; /* Centre horizontalement */
+	flex-direction: column;
+	/* Aligne verticalement */
+	align-items: left;
+	/* Centre horizontalement */
 	text-align: center;
 	margin: 20px;
 }
 
 header svg {
-	margin: 20px 0; /* Espace autour du dessin */
+	margin: 20px 0;
+	/* Espace autour du dessin */
 }
 
 header a {
@@ -20,7 +23,7 @@ body {
 	font-family: sans-serif;
 }
 
-.radiateur {
+.heater {
 	border: 1px solid #ccc;
 	padding: 10px;
 	margin: 10px;
@@ -29,7 +32,7 @@ body {
 	display: inline-block;
 }
 
-.piece {
+.group {
 	font-weight: bold;
 	text-align: center;
 	fill: black;
@@ -71,52 +74,64 @@ body {
 .button-column {
 	margin-top: 40px;
 	display: flex;
-	flex-direction: column; /* empile verticalement */
-	gap: 10px;              /* espace entre les boutons */
-} 
+	flex-direction: column;
+	/* empile verticalement */
+	gap: 10px;
+	/* espace entre les boutons */
+}
 
 /* Empiler les boutons horizontalement */
 .button-column {
 	margin-top: 40px;
 	display: flex;
-	flex-direction: column; /* empile horizontalement */
-	gap: 10px;              /* espace entre les boutons */
-} 
+	flex-direction: column;
+	/* empile horizontalement */
+	gap: 10px;
+	/* espace entre les boutons */
+}
 
 /* Empiler les items horizontalement */
-.items-row{
+.items-row {
 	text-align: left;
 	display: flex;
-	flex-direction: row; /* empile horizontalement */
-	gap: 10px;              /* espace entre les items*/
-} 
+	flex-direction: row;
+	/* empile horizontalement */
+	gap: 10px;
+	/* espace entre les items*/
+}
 
 /* Empiler les items verticalement */
-.items-column{
+.items-column {
 	text-align: left;
 	display: flex;
-	flex-direction: column; /* empile verticalement */
-	gap: 20px;              /* espace entre les items*/
-} 
+	flex-direction: column;
+	/* empile verticalement */
+	gap: 20px;
+	/* espace entre les items*/
+}
 
 /* Empiler les items times verticalement */
-.times-column{
+.times-column {
 	text-align: left;
 	display: flex;
-	flex-direction: column; /* empile verticalement */
-	gap: 10px;              /* espace entre les items*/
-} 
+	flex-direction: column;
+	/* empile verticalement */
+	gap: 10px;
+	/* espace entre les items*/
+}
 
-#mode-combo, #jour-combo {
+#mode-combo,
+#jour-combo {
 	width: 100px;
 	padding: 8px;
 	margin-top: 8px;
 }
 
 /* sélection par ID */
-#h-combo, #m-combo {
+#h-combo,
+#m-combo {
 	width: 60px;
-} 
+}
 
 .close {
 	color: red;

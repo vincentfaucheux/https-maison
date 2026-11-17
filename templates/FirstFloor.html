@@ -4,59 +4,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rez de chaussée</title>
+  <title>Premier étage</title>
 
   <!-- Lien vers le fichier CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='RezDeChausse.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='Floors.css') }}">
 </head>
 
 <body>
   <header>
-    <h1>Rez de chaussée</h1>
+    <h1>Premier étage</h1>
 
-    <!-- plan du rez de chaussee -->
+    <!-- plan du premier étage -->
     <svg width="600" height="600">
       <!-- murs extérieurs -->
-      <line x1="50" y1="550" x2="550" y2="550" stroke="black" stroke-width="4" />
       <!-- devant -->
-      <line x1="50" y1="200" x2="50" y2="550" stroke="black" stroke-width="4" />
+      <line x1="50" y1="550" x2="550" y2="550" stroke="black" stroke-width="4" />
       <!-- gauche -->
-      <line x1="550" y1="50" x2="550" y2="550" stroke="black" stroke-width="4" />
+      <line x1="50" y1="50" x2="50" y2="550" stroke="black" stroke-width="4" />
       <!-- droit -->
-      <line x1="50" y1="200" x2="275" y2="200" stroke="black" stroke-width="4" />
-      <!-- jardin salle -->
-      <line x1="275" y1="50" x2="275" y2="200" stroke="black" stroke-width="4" />
-      <!-- renfoncement salon -->
-      <line x1="275" y1="50" x2="550" y2="50" stroke="black" stroke-width="4" />
-      <!-- jardin chambre -->
+      <line x1="550" y1="50" x2="550" y2="550" stroke="black" stroke-width="4" />
+      <!-- jardin -->
+      <line x1="50" y1="50" x2="550" y2="50" stroke="black" stroke-width="4" />
 
-      <!-- cloisons garage -->
-      <line x1="325" y1="375" x2="325" y2="550" stroke="black" stroke-width="2" />
-      <!-- vertical -->
-      <line x1="325" y1="375" x2="550" y2="375" stroke="black" stroke-width="2" />
-      <!-- horizontal -->
-      <!-- cloisons salle de bain / chambre-->
-      <line x1="425" y1="300" x2="425" y2="375" stroke="black" stroke-width="2" />
-      <!-- vertical -->
-      <line x1="375" y1="300" x2="550" y2="300" stroke="black" stroke-width="2" />
-      <!-- horizontal -->
-      <line x1="375" y1="50" x2="375" y2="300" stroke="black" stroke-width="2" />
-      <!-- vertical -->
-      <!-- cloisons cuisine -->
-      <line x1="250" y1="400" x2="250" y2="550" stroke="black" stroke-width="2" />
-      <!-- vertical -->
-      <line x1="50" y1="400" x2="250" y2="400" stroke="black" stroke-width="2" />
-      <!-- horizontal -->
+      <!-- cloison Charlie -->
+      <line x1="250" y1="50" x2="250" y2="550" stroke="black" stroke-width="2" />
+      <!-- cloison Justin -->
+      <line x1="250" y1="400" x2="550" y2="400" stroke="black" stroke-width="2" />
+      <!-- cloison Martin /Salle de bain-->
+      <line x1="300" y1="300" x2="550" y2="300" stroke="black" stroke-width="2" />
+      <!-- cloison Martin / escalier -->
+      <line x1="300" y1="50" x2="300" y2="300" stroke="black" stroke-width="2" />
 
-      <!-- Noms des pièces -->
-      {% for p in pieces %}
-      <text class="piece" id="{{ p.Id }}" x="{{ p.X }}" y="{{ p.Y }}">{{ p.Nom }}</text>
+      <!-- Groups names -->
+      {% for p in groups %}
+      <text class="group" id="{{ p.Id }}" x="{{ p.X }}" y="{{ p.Y }}">{{ p.Nom }}</text>
 
       {% endfor %}
 
-      <!-- radiateurs -->
-      {% for r in radiateurs %}
-      <rect class="radiateur" id="{{ r.Id }}" data-nom="{{ r.Nom }}" data-state="{{ r.Mode }}" data-nom_state=""
+      <!-- heaters -->
+      {% for r in heaters %}
+      <rect class="heater" id="{{ r.Id }}" data-nom="{{ r.Nom }}" data-state="{{ r.Mode }}" data-nom_state=""
         data-groupe="{{ r.Groupe}}" data-forceheure="{{r.Force.Heure}}" data-forceminute="{{r.Force.Minute}}"
         data-forcemode="{{r.Force.Mode}}" data-schedule="{{ r.Schedule }}" x="{{ r.X }}" y="{{ r.Y }}"
         width="{{ r.Width }}" height="{{ r.Height }}" rx="3" />
@@ -290,7 +277,7 @@
     <a href="/">Home</a>
 
     <!-- script associé à l'HTML -->
-    <script src="{{ url_for('static', filename='RezDeChausse.js') }}"></script>
+    <script src="{{ url_for('static', filename='FirstFloor.js') }}"></script>
 
   </header>
 </body>
